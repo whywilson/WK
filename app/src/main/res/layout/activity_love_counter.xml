@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/activity_love_counter"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@drawable/mac_window"
+	android:gravity="center"
+	android:paddingBottom="24dp"
+	android:paddingLeft="36dp"
+	android:paddingRight="36dp"
+	android:paddingTop="36dp">
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:orientation="horizontal"
+		android:id="@+id/ll_togetherDays">
+
+		<TextView
+			android:id="@+id/tv_WeHaveBeen"
+			android:layout_width="wrap_content"
+			android:layout_height="48dp"
+			android:gravity="center"
+			android:paddingTop="10dp"
+			android:text="@string/weHaveBeenTogetherFor"
+			android:textColor="@color/colorPrimary"
+			android:textSize="15sp"
+			android:paddingBottom="10dp"/>
+
+		<TextView
+			android:id="@+id/daysTextView"
+			android:layout_width="48dp"
+			android:layout_height="48dp"
+			android:gravity="center"
+			android:padding="10dp"
+			android:text="0"
+			android:textColor="#FF0F00"
+			android:textSize="15sp"/>
+
+		<TextView
+			android:id="@+id/tv_Days"
+			android:layout_width="wrap_content"
+			android:layout_height="48dp"
+			android:gravity="center"
+			android:paddingBottom="10dp"
+			android:paddingTop="10dp"
+			android:text="@string/day"
+			android:textColor="@color/colorPrimary"
+			android:textSize="15sp"/>
+
+	</LinearLayout>
+
+	<TextView
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:layout_below="@id/ll_togetherDays"
+		android:layout_alignRight="@id/ll_togetherDays"
+		android:layout_alignLeft="@id/ll_togetherDays"
+		android:textSize="14sp"
+		android:textColor="#777777"
+		android:id="@+id/tv_MacContent"
+		android:gravity="left|center"/>
+
+</RelativeLayout>
+

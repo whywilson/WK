@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="wrap_content"
+	android:layout_width="wrap_content"
+	android:background="@drawable/rounded_rectangle_white_bord">
+
+	<TextView
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="@string/newContacts"
+		android:background="@drawable/rounded_rectangle_blue"
+		android:textSize="16sp"
+		android:textColor="#FFFFFF"
+		android:clickable="true"
+		android:layout_marginBottom="10dp"
+		android:layout_marginLeft="12dp"
+		android:layout_marginRight="12dp"
+		android:paddingTop="8dp"
+		android:paddingBottom="8dp"
+		android:paddingLeft="12dp"
+		android:paddingRight="12dp"
+		android:id="@+id/newContactsTextView"
+		android:layout_centerHorizontal="true"
+		android:layout_alignParentBottom="true"/>
+
+	<ListView
+		android:layout_height="100dp"
+		android:layout_width="match_parent"
+		android:id="@+id/cardListView"
+		android:divider="@color/colorPrimary"
+		android:dividerHeight="1px"
+		android:scrollbars="none"
+		android:minHeight="120dp"
+		android:maxHeight="240dp"
+		android:layout_above="@id/newContactsTextView"
+		android:layout_alignParentTop="true"
+		android:paddingLeft="10dp"
+		android:paddingRight="10dp"/>
+
+</RelativeLayout>
+

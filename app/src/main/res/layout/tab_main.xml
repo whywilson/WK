@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/setWallpaper"
+	style="@style/AppTheme"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@drawable/autumn_0"
+	android:gravity="bottom"
+	android:orientation="vertical">
+
+	<android.support.constraint.ConstraintLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<ImageView
+			android:id="@+id/sun_0"
+			style="@style/Theme.Transparent"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/sun_0"
+			tools:layout_editor_absoluteY="-6dp"
+			tools:layout_editor_absoluteX="-2dp" />
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="0dp"
+			android:orientation="vertical"
+			android:visibility="invisible"
+			android:id="@+id/wkImage"
+			tools:layout_constraintTop_creator="1"
+			tools:layout_constraintRight_creator="1"
+			tools:layout_constraintBottom_creator="1"
+			android:layout_marginStart="8dp"
+			app:layout_constraintBottom_toBottomOf="parent"
+			android:layout_marginEnd="8dp"
+			app:layout_constraintRight_toRightOf="parent"
+			tools:layout_constraintLeft_creator="1"
+			app:layout_constraintLeft_toLeftOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+
+			<ImageView
+				android:id="@+id/kImage"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:src="@drawable/karina" />
+
+			<ImageView
+				android:id="@+id/wImage"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:src="@drawable/wilson" />
+
+		</LinearLayout>
+
+		<ImageView
+			android:src="@drawable/smile_0"
+			style="@style/Theme.Transparent"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/smileCloud"
+			android:layout_marginEnd="55dp"
+			app:layout_constraintTop_toTopOf="parent"
+			android:layout_marginTop="109dp"
+			android:layout_marginRight="47dp"
+			app:layout_constraintRight_toRightOf="parent" />
+
+	</android.support.constraint.ConstraintLayout>
+
+</LinearLayout>
+

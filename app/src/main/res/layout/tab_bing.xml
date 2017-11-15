@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+
+	<!--<cc.yuyeye.wk.Layout.SquareRelativeLayout-->
+		<!--android:visibility="visible"-->
+		<!--android:id="@+id/gridShowImageLayout"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="match_parent">-->
+
+		<!--<ImageView-->
+			<!--android:id="@+id/gridShowImage"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="match_parent"-->
+			<!--android:scaleType="centerCrop"-->
+			<!--android:src="@drawable/blue"/>-->
+
+	<!--</cc.yuyeye.wk.Layout.SquareRelativeLayout>-->
+	
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/bing_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+	
+	
+	<!--<GridView
+		android:id="@+id/id_gridView"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_gravity="center_horizontal"
+		android:numColumns="3"
+		android:verticalSpacing="1dp"
+		android:paddingTop="1dp"
+		android:scrollbars="none"/>-->
+
+</LinearLayout>
+

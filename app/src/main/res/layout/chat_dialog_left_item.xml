@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:paddingBottom="4dp"
+	android:orientation="horizontal"
+    android:clickable="true"
+	android:id="@+id/chatdialogleftitemRelativeLayout1">
+
+	<com.android.volley.toolbox.NetworkImageView
+		android:id="@+id/wk_chat_image_left"
+		android:layout_width="30dp"
+		android:layout_height="30dp"
+		android:layout_gravity="top"
+		android:focusable="false"
+		android:src="@drawable/ali_0"/>
+
+	<TextView
+        android:clickable="true"
+		android:id="@+id/wk_chat_message"
+        android:text="@string/test_msg"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:background="@drawable/rounded_left_dialog"
+		android:textColor="#000000"
+		android:autoLink="email|web"
+		android:textSize="16sp"
+		android:gravity="left|center_horizontal"
+		android:layout_marginLeft="4dp"
+		android:layout_marginRight="50dp"
+		android:maxWidth="200dp"
+		android:paddingLeft="14dp"
+		android:paddingRight="8dp"
+		android:paddingTop="8dp"
+		android:paddingBottom="8dp"
+		android:layout_alignStart="@+id/wk_chat_left_name"
+        android:layout_below="@+id/wk_chat_left_name" />
+
+	<TextView
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:id="@+id/wk_chat_left_name"
+        android:text="@string/Turing"
+		android:textSize="10sp"
+		android:layout_toRightOf="@id/wk_chat_image_left"
+		android:focusable="false"
+		android:layout_marginLeft="4dp"/>
+
+	<android.support.v7.widget.AppCompatCheckBox
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+        android:clickable="false"
+		android:id="@+id/chatdialogleftitemCheckBox"
+		android:layout_alignParentRight="true"
+		android:layout_marginTop="10dp"
+		android:visibility="gone"/>
+
+	<TextView
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="05:20"
+		android:layout_alignParentTop="true"
+		android:layout_centerHorizontal="true"
+		android:textSize="10sp"
+		android:id="@+id/chatdialogleftTime"/>
+
+</RelativeLayout>
+

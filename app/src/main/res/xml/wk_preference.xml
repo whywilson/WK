@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/setting">
+    <PreferenceCategory/>
+    <PreferenceCategory
+        android:layout="@layout/preference_category_widget"
+        android:title="@string/personSetting">
+        <EditTextPreference
+            android:enabled="false"
+            android:key="id_edittext_key"
+            android:padding="16dp"
+            android:singleLine="true"
+            android:summary="@string/inputID"
+            android:title="@string/ID" />
+        <EditTextPreference
+            android:hint="@string/conditionToChangeID"
+            android:imeOptions="actionDone"
+            android:key="qq_edittext_key"
+            android:layout="@layout/preference_item"
+            android:numeric="integer"
+            android:title="@string/qqNum" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:layout="@layout/preference_category_widget"
+        android:title="@string/appearanceSetting">
+        <ListPreference
+            android:dialogTitle="@string/ImageSourceSetting"
+            android:entries="@array/imageSourceArray"
+            android:entryValues="@array/imageSourceArrayValues"
+            android:key="image_source"
+            android:layout="@layout/preference_item"
+            android:title="@string/ImageSourceSetting" />
+        <ListPreference
+            android:dialogTitle="@string/appSourceSetting"
+            android:entries="@array/updateSourceArray"
+            android:entryValues="@array/updateSourceArrayValues"
+            android:key="update_source"
+            android:layout="@layout/preference_item"
+            android:title="@string/appSourceSetting" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="show_nettype_key"
+            android:layout="@layout/preference_item"
+            android:title="@string/show_net_type"
+            android:widgetLayout="@layout/switch_layout" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="enterSend_switch_key"
+            android:layout="@layout/preference_item"
+            android:title="@string/isEnterSend"
+            android:widgetLayout="@layout/switch_layout" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="saveMsg_switch_key"
+            android:layout="@layout/preference_item"
+            android:title="@string/saveTipMsg"
+            android:widgetLayout="@layout/switch_layout" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:layout="@layout/preference_category_widget"
+        android:title="@string/otherSetting">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="log_switch_key"
+            android:layout="@layout/preference_item"
+            android:title="@string/saveLog"
+            android:widgetLayout="@layout/switch_layout" />
+		<CheckBoxPreference
+            android:defaultValue="false"
+            android:key="dev_update_key"
+            android:layout="@layout/preference_item"
+            android:title="@string/betaUpdate"
+            android:widgetLayout="@layout/switch_layout" />
+    </PreferenceCategory>
+    <Preference
+        android:key="about_key"
+        android:layout="@layout/preference_item"
+        android:title="@string/about" />
+    <PreferenceCategory/>
+</PreferenceScreen>

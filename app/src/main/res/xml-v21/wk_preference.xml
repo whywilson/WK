@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    
+    android:title="@string/setting">
+    <PreferenceCategory
+        android:title="@string/personSetting">
+        <EditTextPreference
+            android:enabled="false"
+            android:key="id_edittext_key"
+            android:singleLine="false"
+            android:summary="@string/inputID"
+            android:title="@string/ID" />
+        <EditTextPreference
+            android:hint="@string/conditionToChangeID"
+            android:imeOptions="actionDone"
+            android:key="qq_edittext_key"
+            
+            android:numeric="integer"
+            android:title="@string/qqNum" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        
+        android:title="@string/appearanceSetting">
+        <ListPreference
+            android:dialogTitle="@string/ImageSourceSetting"
+            android:entries="@array/imageSourceArray"
+            android:entryValues="@array/imageSourceArrayValues"
+            android:key="image_source"
+            
+            android:title="@string/ImageSourceSetting" />
+        <ListPreference
+            android:dialogTitle="@string/appSourceSetting"
+            android:entries="@array/updateSourceArray"
+            android:entryValues="@array/updateSourceArrayValues"
+            android:key="update_source"
+            
+            android:title="@string/appSourceSetting" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="show_nettype_key"
+            android:title="@string/show_net_type" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="enterSend_switch_key"
+            android:title="@string/isEnterSend" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="saveMsg_switch_key"
+            android:title="@string/saveTipMsg" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        
+        android:title="@string/otherSetting">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="log_switch_key"
+            
+            android:title="@string/saveLog"
+             />
+		<SwitchPreference
+            android:defaultValue="false"
+            android:key="dev_update_key"
+
+            android:title="@string/betaUpdate"
+		/>
+		</PreferenceCategory>
+    <Preference
+        android:key="about_key"
+        android:title="@string/about"/>
+</PreferenceScreen>

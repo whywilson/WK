@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#FFFFFF"
+    android:padding="3dp">
+
+    <ImageView
+        android:id="@+id/notificationImage"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_file_download_grey" />
+
+    <TextView
+        android:id="@+id/notificationTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/notificationPercent"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/notificationImage"
+        android:layout_toRightOf="@id/notificationImage"
+        android:paddingLeft="6dp"
+        android:paddingTop="6dp"
+        android:text="Downloading"
+        android:textColor="#000000"
+        tools:ignore="RtlSymmetry" />
+
+    <TextView
+        android:id="@+id/notificationPercent"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/notificationImage"
+        android:layout_toLeftOf="@+id/notificationProgress"
+        android:gravity="center|center_horizontal"
+        android:paddingBottom="2dp"
+        android:paddingTop="2dp"
+        android:text="@string/_1"
+        android:textColor="#000000" />
+
+    <ProgressBar
+        android:id="@+id/notificationProgress"
+        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/notificationPercent"
+        android:layout_alignLeft="@id/notificationTitle"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/notificationPercent"
+        android:layout_below="@id/notificationTitle"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp" />
+
+</RelativeLayout>
+

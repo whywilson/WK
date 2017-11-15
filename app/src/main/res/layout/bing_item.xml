@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cc.yuyeye.wk.Layout.SquareRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+	android:paddingTop="1dp" >
+
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/bing_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"         
+        android:layout_centerInParent="true"
+        android:scaleType="centerCrop" />
+
+</cc.yuyeye.wk.Layout.SquareRelativeLayout>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="wrap_content"
+	android:layout_width="match_parent"
+	android:paddingBottom="4dp"
+	android:gravity="right"
+    android:clickable="true"
+	android:id="@+id/chatdialogrightitemRelativeLayout1">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="end"
+		android:layout_toLeftOf="@+id/chatdialogrightitemCheckBox">
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="0dp"
+			android:orientation="vertical"
+			android:gravity="right"
+			android:paddingRight="4dp"
+			android:layout_weight="1.0">
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:id="@+id/wk_chat_right_name"
+				android:textSize="10sp"
+				android:text="@string/Turing"
+				android:focusable="false"/>
+
+			<TextView
+                android:text="@string/test_msg"
+				android:clickable="true"
+				android:id="@+id/wk_chat_me_message"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="16sp"
+				android:textColor="#FFFFFF"
+				android:gravity="left|center_vertical"
+				android:lineSpacingExtra="2dp"
+				android:autoLink="email|web"
+				android:maxWidth="200dp"
+				android:layout_marginTop="2dp"
+				android:background="@drawable/rounded_right_dialog"
+				android:paddingLeft="8dp"
+				android:paddingRight="14dp"
+				android:paddingTop="8dp"
+				android:paddingBottom="8dp"
+				android:textColorLink="#FFFF87"/>
+
+		</LinearLayout>
+
+		<com.android.volley.toolbox.NetworkImageView
+			android:id="@+id/wk_chat_image_right"
+			android:layout_width="30dp"
+			android:layout_height="30dp"
+			android:focusable="false"
+			android:src="@drawable/doraemon_0"/>
+
+	</LinearLayout>
+
+	<android.support.v7.widget.AppCompatCheckBox
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:clickable="false"
+		android:id="@+id/chatdialogrightitemCheckBox"
+		android:visibility="gone"
+		android:layout_alignParentRight="true"/>
+
+	<TextView
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="15:20"
+		android:textSize="10sp"
+		android:layout_alignParentTop="true"
+		android:layout_centerHorizontal="true"
+		android:id="@+id/chatdialogrightTime"/>
+
+</RelativeLayout>
+

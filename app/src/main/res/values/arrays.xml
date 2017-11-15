@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="updateSourceArray">
+        <item>Server</item>
+        <item>GitHub</item>
+    </string-array>
+    <string-array name="updateSourceArrayValues">
+        <item>http://api.yuyeye.cc/WK-release.apk</item>
+        <item>https://raw.githubusercontent.com/wilsonqq/WK/Dev/apk/app-release.apk</item>
+    </string-array>
+    <string-array name="imageSourceArray">
+        <item>必应壁纸</item>
+        <item>人家还没想好(･ิω･ิ)</item>
+    </string-array>
+    <string-array name="imageSourceArrayValues">
+        <item>https://yuyeye.cc/bing/</item>
+        <item>Developing</item>
+    </string-array>
+</resources>

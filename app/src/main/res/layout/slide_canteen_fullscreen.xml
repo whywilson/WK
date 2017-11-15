@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.heinrichreimersoftware.materialintro.view.parallax.ParallaxRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/autumn_0"
+        android:gravity="center">
+
+
+        <ImageView
+            android:id="@id/mi_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="@dimen/mi_baseline"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            app:layout_parallaxFactor="0.5"
+            android:layout_above="@id/mi_title"
+            app:srcCompat="@drawable/ic_clock" />
+
+        <TextView
+            android:id="@id/mi_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/mi_baseline"
+            android:layout_above="@id/mi_description"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:fontFamily="sans-serif-medium"
+            tools:ignore="UnusedAttribute"
+            tools:text="Lorem ipsum"
+            android:text="tittle" />
+
+        <TextView
+            android:id="@id/mi_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-medium"
+            tools:ignore="UnusedAttribute"
+            android:layout_marginBottom="@dimen/mi_baseline"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="Description" />
+    </com.heinrichreimersoftware.materialintro.view.parallax.ParallaxRelativeLayout >
+
+</layout>

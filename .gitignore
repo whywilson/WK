@@ -1,0 +1,7 @@
+#ignore these files 
+local.properties
+.gradle/
+.idea/
+WK.iml
+build/
+*.zip

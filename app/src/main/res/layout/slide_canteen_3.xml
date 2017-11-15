@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.heinrichreimersoftware.materialintro.view.parallax.ParallaxRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <ImageView
+            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/intro_scene_03_bg" />
+
+        <ImageView
+            android:scaleType="centerCrop"
+            android:id="@id/mi_image"
+            android:padding="@dimen/mi_baseline"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            app:layout_parallaxFactor="1"
+            android:layout_above="@id/mi_title"
+            app:srcCompat="@drawable/intro_scene_03_dynamic" />
+        <ImageView
+            android:scaleType="fitXY"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/intro_scene_03_mask" />
+
+        <TextView
+            android:id="@id/mi_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/mi_baseline"
+            android:layout_above="@id/mi_description"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:fontFamily="sans-serif-medium"
+            tools:ignore="UnusedAttribute"
+            tools:text="Lorem ipsum"
+            android:text="tittle" />
+
+        <TextView
+            android:id="@id/mi_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            app:layout_parallaxFactor="1.5"
+            android:textColor="@color/white"
+            android:layout_marginBottom="@dimen/mi_baseline"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="Description" />
+
+
+    </com.heinrichreimersoftware.materialintro.view.parallax.ParallaxRelativeLayout >
+
+</layout>
