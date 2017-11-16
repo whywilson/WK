@@ -2,6 +2,6 @@
 local.properties
 .gradle/
 .idea/
-WK.iml
+*.iml
 build/
 *.zip
