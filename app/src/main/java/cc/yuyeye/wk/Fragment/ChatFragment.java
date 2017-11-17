@@ -404,7 +404,23 @@ public class ChatFragment extends Fragment {
             }
 
         });
+		chatAdaper.setRecyclerViewOnItemClickListener(new ChatAdapter.RecyclerViewOnItemClickListener(){
 
+				@Override
+				public void onItemClickListener(View view, int position)
+				{
+					view.getTag(position);
+				}
+
+				@Override
+				public boolean onItemLongClickListener(View view, int position)
+				{
+					// TODO: Implement this method
+					return false;
+				}
+			});
+		
+		
         super.onActivityCreated(savedInstanceState);
     }
 
