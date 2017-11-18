@@ -32,6 +32,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
@@ -55,6 +56,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import cc.yuyeye.wk.Activity.LoginActivity;
@@ -73,6 +75,7 @@ import cc.yuyeye.wk.Util.ToastUtil;
 
 import static cc.yuyeye.wk.MainActivity.SaveChatRecord;
 import static cc.yuyeye.wk.MainActivity.checkSendPerson;
+import static cc.yuyeye.wk.MainActivity.getCurrentTime;
 import static cc.yuyeye.wk.MainActivity.phoneAlias;
 import static cc.yuyeye.wk.MainActivity.mQueue;
 import static cc.yuyeye.wk.MainActivity.sendPerson;
@@ -85,7 +88,7 @@ import cc.yuyeye.wk.*;
 
 public class ChatFragment extends Fragment {
 
-    public static List<chatListBean> mChatLists = new ArrayList<>();
+//    public static List<chatListBean> mChatDialogLists = new ArrayList<>();
     public static List<chatListBean> mChatDialogLists = new ArrayList<>();
     public static EditText mChatMsg;
     public static LinearLayout mChatTools;
@@ -124,6 +127,7 @@ public class ChatFragment extends Fragment {
     public static ArrayList<String> contactList = new ArrayList<>();
     private TextView mChatNetType;
     private int contactId;
+    private int deleteItemPosition = 0;
 
     public static ChatFragment newInstance() {
         return new ChatFragment();
@@ -221,7 +225,7 @@ public class ChatFragment extends Fragment {
                         .title(R.string.alert)
                         .content(getString(R.string.confirm_delete) + mChatContact.getText() + " ?")
                         .positiveText(R.string.confirm)
-                        .negativeColor(R.color.colorPrimary)
+                        .negativeColorRes(R.color.colorPrimary)
                         .negativeText(R.string.cancel)
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
 
@@ -392,7 +396,6 @@ public class ChatFragment extends Fragment {
                 sendMSG(MSG_TYPE);
             }
         });
-
         mChatCircleImage.setOnLongClickListener(new OnLongClickListener() {
 
             @Override
@@ -414,10 +417,96 @@ public class ChatFragment extends Fragment {
 
             @Override
             public boolean OnItemLongClickListener(int position, ChatAdapter.ViewHolder vh) {
-                return false;
+                return true;
             }
         });
+        mChatToolsShare.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                {
+                    List<chatListBean> chat_dialog_id_list = chatAdaper.getChatDialogId();
+                    if (chat_dialog_id_list.size() > 0) {
+                        String share_msg = getString(R.string.with) + sendPerson + getString(R.string.chatRecords);
+                        Intent share_intent = new Intent();
+                        share_intent.setAction(Intent.ACTION_SEND);//设置分享行为
+                        share_intent.setType("text/plain");//设置分享内容的类型
+                        share_intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.with) + sendPerson + getString(R.string.chatRecords));//添加分享内容标题
 
+                        for (int i = 0; i < chat_dialog_id_list.size(); i++) {
+                            share_msg += "\n" + chat_dialog_id_list.get(i).getTime();
+                            share_msg += "\n" + chat_dialog_id_list.get(i).getcSend() + ": ";
+                            share_msg += chat_dialog_id_list.get(i).getMsgContent();
+                        }
+                        share_intent.putExtra(Intent.EXTRA_TEXT, share_msg);//添加分享内容
+                        //创建分享的Dialog
+                        share_intent = Intent.createChooser(share_intent, getString(R.string.shareTo));
+                        getActivity().startActivity(share_intent);
+
+                        chatAdaper.showActionBar(false);
+                        chatAdaper.setActionMode();
+                        chatAdaper.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(getActivity(), getString(R.string.NotSelectAnyRecords), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+        mChatToolsCancel.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chatAdaper.showActionBar(false);
+                chatAdaper.setActionMode();
+                chatAdaper.notifyDataSetChanged();
+                mChatToolsSelectAll.setText(R.string.selectAll);
+//                chatMsgHandler.sendEmptyMessage(-1);
+            }
+        });
+        mChatToolsSelectAll.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Integer> chat_db_id_list = chatAdaper.getChatDbId();
+                if (chat_db_id_list.size() < chatAdaper.getItemCount()) {
+                    chatAdaper.selectAllItem(true);
+                    chatAdaper.notifyDataSetChanged();
+                    mChatToolsSelectAll.setText(R.string.cancelSelectAll);
+                } else {
+                    chatAdaper.selectAllItem(false);
+                    mChatToolsSelectAll.setText(R.string.selectAll);
+                }
+            }
+        });
+        mChatToolsDelete.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Map<Integer, Boolean> chat_checkBox_map = chatAdaper.getCheckBoxMap();
+                List<chatListBean> chat_dialog_id_list = chatAdaper.getChatDialogId();
+                List<Integer> chat_db_id_list = chatAdaper.getChatDbId();
+                if (chat_dialog_id_list.size() > 0 && chat_db_id_list.size() > 0) {
+                    try {
+                        for (int i = 0; i < chat_checkBox_map.size(); i++) {
+                            if (chat_checkBox_map.get(i)) {
+                                deleteItemPosition = i;
+                                break;
+                            }
+                        }
+                        for (int i = 0; i < chat_db_id_list.size(); i++) {
+                            mChatDialogLists.remove(chat_dialog_id_list.get(i));
+                            chatDb.deleteById(phoneAlias, chat_db_id_list.get(i));
+                            //chatAdaper.notifyDataSetChanged();
+                            chatAdaper.notifyItemRemoved(deleteItemPosition);
+                            chatAdaper.notifyItemRangeChanged(deleteItemPosition, chatAdaper.getItemCount());
+                        }
+                        chatAdaper.selectAllItem(false);
+
+                        //  chatMsgHandler.sendEmptyMessage(deleteItemPosition);
+                    } catch (Exception e) {
+                        LogUtil.e("wk_delete", getString(R.string.deleteRecordsError) + e);
+                    }
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.NotSelectAnyRecords), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -502,7 +591,7 @@ public class ChatFragment extends Fragment {
     private void addContactDialog() {
         new MaterialDialog.Builder(getActivity())
                 .title(R.string.add)
-                .inputRange(1,20)
+                .inputRange(1, 20)
                 .input(getResources().getString(R.string.contacts), "", new MaterialDialog.InputCallback() {
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
@@ -568,7 +657,9 @@ public class ChatFragment extends Fragment {
                     chatListBean.setMeSend(true);
                     chatListBean.setMsgContent(mChatMsg.getText().toString());
                     chatListBean.setcSend(phoneAlias);
+                    chatListBean.setTime(getCurrentTime());
                     chatListBean.setIconUrl(tencentUtil.getQqIconUrl(qq));
+//                    mChatDialogLists.add(chatListBean);
                     chatAdaper.addItem(chatListBean);
 
                     chatMsgHandler.sendEmptyMessage(-1);
@@ -669,28 +760,28 @@ public class ChatFragment extends Fragment {
 
     public void initChatDialog() {
         try {
-            mChatLists = chatDb.getChatRecord(phoneAlias, sendPerson, phoneAlias);
-            if (mChatLists != null) {
-                mChatDialogLists.clear();
-
-                for (chatListBean c : mChatLists) {
-                    chatListBean clb = new chatListBean();
-
-                    if (c.getcSend().equals(phoneAlias)) {
-                        clb.setMeSend(true);
-                        clb.setIconUrl(tencentUtil.getQqIconUrl(qq));
-                    } else {
-                        clb.setMeSend(false);
-                    }
-                    clb.setId(c.getId());
-                    clb.setMsgContent(c.getMsgContent());
-                    clb.setcSend(c.getcSend());
-                    clb.setTime(c.getTime());
-                    mChatDialogLists.add(clb);
-                }
-                chatAdaper.notifyDataSetChanged();
-//                chatAdaper.notifyItemInserted(mChatDialogLists.size() - 1);
-                //todo 滑动啥
+            mChatDialogLists = chatDb.getChatRecord(phoneAlias, sendPerson, phoneAlias);
+            if (mChatDialogLists != null) {
+//                mChatDialogLists.clear();
+//
+//                for (chatListBean c : mChatDialogLists) {
+//                    chatListBean clb = new chatListBean();
+//
+//                    if (c.getcSend().equals(phoneAlias)) {
+//                        clb.setMeSend(true);
+//                        clb.setIconUrl(tencentUtil.getQqIconUrl(qq));
+//                    } else {
+//                        clb.setMeSend(false);
+//                    }
+//                    clb.setId(c.getId());
+//                    clb.setMsgContent(c.getMsgContent());
+//                    clb.setcSend(c.getcSend());
+//                    clb.setTime(c.getTime());
+//                    mChatDialogLists.add(clb);
+//                }
+//                chatAdaper.notifyDataSetChanged();
+////                chatAdaper.notifyItemInserted(mChatDialogLists.size() - 1);
+//                //todo 滑动啥
                 chatRecyclerView.smoothScrollToPosition(chatAdaper.getItemCount());
                 chatMsgHandler.sendEmptyMessage(-1);
             }
@@ -712,13 +803,14 @@ public class ChatFragment extends Fragment {
                 if (sharedPreferences.getBoolean(SettingUtil.SAVE_MSG_KEY, false)) {
                     checkSendPerson();
                     new Thread(runWk_msgAdd).start();
-					chatListBean chatListBean = new chatListBean();
+                    chatListBean chatListBean = new chatListBean();
                     chatListBean.setMeSend(true);
                     chatListBean.setMsgContent(msgDetail);
                     chatListBean.setcSend(phoneAlias);
                     chatListBean.setIconUrl(tencentUtil.getQqIconUrl(qq));
+//                    mChatDialogLists.add(chatListBean);
                     chatAdaper.addItem(chatListBean);
-					chatMsgHandler.sendEmptyMessage(-1);
+                    chatMsgHandler.sendEmptyMessage(-1);
                     SaveChatRecord(phoneAlias, phoneAlias, msgAcceptPerson, msgDetail);
                 }
 
@@ -854,7 +946,6 @@ public class ChatFragment extends Fragment {
         //后面尖括号内分别是参数（例子里是线程休息时间），进度（publishProgress用到），返回值类型
         @Override
         protected void onPreExecute() {
-            //第一个执行方法
             result = "";
 
             nameValuePairs = new ArrayList<>();
@@ -868,7 +959,6 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected String doInBackground(Integer[] params) {
-            //第二个执行方法,onPreExecute()执行完后执行
             try {
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpPost httppost = new HttpPost("http://www.tuling123.com/openapi/api");
@@ -899,7 +989,6 @@ public class ChatFragment extends Fragment {
 
                 for (int i = 0; i < jsonObj.length(); i++) {
                     TuringCode = jsonObj.getInt("code");
-
                 }
                 if (TuringCode == 100000) {
                     TuringInfo = jsonObj.getString("text");

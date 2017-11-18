@@ -13,14 +13,14 @@ public class chatListBean {
         super();
     }
 
-    public chatListBean(int cId, String cSend, String cReceive, String cMsg, String cTime) {
+    public chatListBean(int cId, String cSend, String cReceive, String cMsg, String cTime, boolean isMeSend) {
         super();
         this.id = cId;
         this.time = cTime;
         this.cSend = cSend;
         this.cReceive = cReceive;
         this.msgContent = cMsg;
-
+        this.isMeSend = isMeSend;
     }
 
     public int getId() {
@@ -71,4 +71,11 @@ public class chatListBean {
         this.isMeSend = isMeSend;
     }
 
+    public String getcReceive() {
+        return cReceive;
+    }
+
+    public void setcReceive(String cReceive) {
+        this.cReceive = cReceive;
+    }
 }

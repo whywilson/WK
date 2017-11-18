@@ -1,17 +1,15 @@
 package cc.yuyeye.wk.Activity;
 
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.TypefaceSpan;
 
-import cc.yuyeye.wk.R;
-import cc.yuyeye.wk.Util.SettingUtil;
-
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
 import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
+
+import cc.yuyeye.wk.R;
 
 public class CanteenIntroActivity extends IntroActivity {
     @Override

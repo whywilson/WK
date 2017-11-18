@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import java.util.Map;
 
 import cc.yuyeye.wk.Common;
 import cc.yuyeye.wk.DB.chatListBean;
+import cc.yuyeye.wk.Fragment.ChatFragment;
 import cc.yuyeye.wk.R;
 import cc.yuyeye.wk.Util.BitmapCache;
 import cc.yuyeye.wk.Util.ToastUtil;
@@ -62,7 +64,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public ChatAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v;
-        if (viewType == msgViewType.MSG_SEND) {
+        if (viewType == ChatAdapter.viewType.MSG_SEND) {
             v = LayoutInflater.from(context).inflate(R.layout.chat_dialog_right_item, parent, false);
         } else {
             v = LayoutInflater.from(context).inflate(R.layout.chat_dialog_left_item, parent, false);
@@ -110,93 +112,94 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder vh, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         //final ViewHolder vh = (ViewHolder)holder;
-        vh.wk_chat_message.setOnClickListener(new View.OnClickListener() {
+        holder.wk_chat_message.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!isActionMode) {
                     ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                    cmb.setText(vh.wk_chat_message.getText().toString());
+                    assert cmb != null;
+                    cmb.setText(holder.wk_chat_message.getText().toString());
                     ToastUtil.showSimpleToast(context.getString(R.string.copied), 100);
                 } else {
-                    //setSelectItem(position);
+                    setSelectItem(position);
                 }
             }
         });
-        if (getItemViewType(position) == msgViewType.MSG_SEND) {
-            vh.wk_chat_image.setDefaultImageResId(R.drawable.ali_0);
+        if (getItemViewType(position) == viewType.MSG_SEND) {
+            holder.wk_chat_image.setDefaultImageResId(R.drawable.ali_0);
         } else {
-            vh.wk_chat_image.setDefaultImageResId(R.drawable.account);
+            holder.wk_chat_image.setDefaultImageResId(R.drawable.account);
         }
 
-        vh.mItem = items.get(position);
-        vh.wk_chat_name.setText(items.get(position).getcSend());
-        vh.wk_chat_message.setText(items.get(position).getMsgContent());
-        vh.wk_chat_image.setImageUrl(items.get(position).getIconUrl(), loader);
+        holder.mItem = items.get(position);
+        holder.wk_chat_name.setText(items.get(position).getcSend());
+        holder.wk_chat_message.setText(items.get(position).getMsgContent());
+        holder.wk_chat_image.setImageUrl(items.get(position).getIconUrl(), loader);
         try {
             chatListBean entity = items.get(position);
             if (items.size() > 1) {
                 chatListBean entity_before = items.get(Math.abs(position - 1));
                 if (entity.getTime().substring(10, 16).equals(entity_before.getTime().substring(10, 16)) && position != 0) {
-                    vh.wk_chat_time.setVisibility(TextView.GONE);
+                    holder.wk_chat_time.setVisibility(TextView.GONE);
                 } else {
                     if (entity.getTime().substring(0, 10).equals(getCurrentTime().substring(0, 10))) {
-                        vh.wk_chat_time.setText(entity.getTime().substring(10, 16));
+                        holder.wk_chat_time.setText(entity.getTime().substring(10, 16));
                     } else {
-                        vh.wk_chat_time.setText(entity.getTime().substring(0, 16));
+                        holder.wk_chat_time.setText(entity.getTime().substring(0, 16));
                     }
                 }
             } else {
-                vh.wk_chat_time.setText(entity.getTime().substring(0, 16));
+                holder.wk_chat_time.setText(entity.getTime().substring(0, 16));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-//        if (isActionMode) {
-//            holder.wk_chat_checkbox.setVisibility(View.VISIBLE);
-//            holder.wk_chat_message.setDuplicateParentStateEnabled(true);
-//        } else {
-//            holder.wk_chat_checkbox.setVisibility(View.GONE);
-//            holder.wk_chat_message.setDuplicateParentStateEnabled(false);
-//        }
-//        //设置TAG
-//        holder.itemView.setTag(position);
-//        holder.wk_chat_checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-//                checkBoxMap.put(position, b);
-//            }
-//        });
-//        //设置checkbox状态
-//        if (checkBoxMap.get(position) == null) {
-//            checkBoxMap.put(position, false);
-//        }
-//        holder.wk_chat_checkbox.setChecked(checkBoxMap.get(position));
-//
-//        holder.wk_chat_message.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (!isActionMode) {
-//                    ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-//                    cmb.setText(items.get(position).getMsgContent().trim());
-//                    ToastUtil.showSimpleToast(context.getString(R.string.copied), 100);
-//                } else {
-//                    setSelectItem(position);
-//                }
-//            }
-//        });
-//        holder.wk_chat_message.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-////                selectAllItem(false);
-////                setActionMode();
-////                setSelectItem(position);
-////                notifyDataSetChanged();
-//                return true;
-//            }
-//        });
+        if (isActionMode) {
+            holder.wk_chat_checkbox.setVisibility(View.VISIBLE);
+            holder.wk_chat_message.setDuplicateParentStateEnabled(true);
+        } else {
+            holder.wk_chat_checkbox.setVisibility(View.GONE);
+            holder.wk_chat_message.setDuplicateParentStateEnabled(false);
+        }
+        //设置TAG
+        holder.itemView.setTag(position);
+        holder.wk_chat_checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                checkBoxMap.put(position, b);
+            }
+        });
+        //设置checkbox状态
+        if (checkBoxMap.get(position) == null) {
+            checkBoxMap.put(position, false);
+        }
+        holder.wk_chat_checkbox.setChecked(checkBoxMap.get(position));
+
+        holder.wk_chat_message.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isActionMode) {
+                    ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    cmb.setText(items.get(position).getMsgContent().trim());
+                    ToastUtil.showSimpleToast(context.getString(R.string.copied), 100);
+                } else {
+                    setSelectItem(position);
+                }
+            }
+        });
+        holder.wk_chat_message.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                selectAllItem(false);
+                setActionMode();
+                setSelectItem(position);
+                notifyDataSetChanged();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -205,6 +208,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     public void addItem(chatListBean data) {
+        ChatFragment.mChatDialogLists.add(data);
         items.add(data);
         notifyItemInserted(items.size());
     }
@@ -324,7 +328,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     //接口回调设置点击事件
     public interface OnItemListener {
         void OnItemClickListener(int position, ViewHolder vh);
-
         boolean OnItemLongClickListener(int position, ViewHolder vh);
     }
 
@@ -332,13 +335,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         chatListBean entity = items.get(position);
 
         if (entity.isMeSend()) {
-            return msgViewType.MSG_SEND;
+            return viewType.MSG_SEND;
         } else {
-            return msgViewType.MSG_COME;
+            return viewType.MSG_COME;
         }
     }
 
-    interface msgViewType {
+    interface viewType {
         int MSG_SEND = 0;
         int MSG_COME = 1;
     }

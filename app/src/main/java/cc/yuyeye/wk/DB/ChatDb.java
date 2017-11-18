@@ -11,6 +11,9 @@ import java.util.ArrayList;
 
 import cc.yuyeye.wk.R;
 
+import static cc.yuyeye.wk.Fragment.ChatFragment.qq;
+import static cc.yuyeye.wk.Fragment.ChatFragment.tencentUtil;
+
 public class ChatDb extends Activity {
     public ChatDbHelper DbHelper;
 
@@ -63,12 +66,20 @@ public class ChatDb extends Activity {
 
             if (cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
-                    int cId = cursor.getInt(0);
-                    String cSend = cursor.getString(1);
-                    String cReceive = cursor.getString(2);
-                    String cMsg = cursor.getString(3);
-                    String cTime = cursor.getString(4);
-                    chatListBeen.add(new chatListBean(cId, cSend, cReceive, cMsg, cTime));
+                    chatListBean clb = new chatListBean();
+                    clb.setId(cursor.getInt(0));
+                    clb.setcSend(cursor.getString(1));
+                    clb.setcReceive(cursor.getString(2));
+                    clb.setMsgContent(cursor.getString(3));
+                    clb.setTime(cursor.getString(4));
+
+                    if(cursor.getString(1).equals(phoneAlias)){
+                        clb.setMeSend(true);
+                        clb.setIconUrl(tencentUtil.getQqIconUrl(qq));
+                    }else {
+                        clb.setMeSend(false);
+                    }
+                    chatListBeen.add(clb);
                 }
                 cursor.close();
                 return chatListBeen;
