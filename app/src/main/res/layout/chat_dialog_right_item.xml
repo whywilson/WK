@@ -6,13 +6,13 @@
 	android:paddingBottom="4dp"
 	android:gravity="right"
     android:clickable="true"
-	android:id="@+id/chatdialogrightitemRelativeLayout1">
+	android:id="@+id/wk_chat_layout">
 
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:gravity="end"
-		android:layout_toLeftOf="@+id/chatdialogrightitemCheckBox">
+		android:layout_toLeftOf="@+id/wk_chat_checkbox">
 
 		<LinearLayout
 			android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
 			<TextView
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
-				android:id="@+id/wk_chat_right_name"
+				android:id="@+id/wk_chat_name"
 				android:textSize="10sp"
 				android:text="@string/Turing"
 				android:focusable="false"/>
@@ -33,7 +33,7 @@
 			<TextView
                 android:text="@string/test_msg"
 				android:clickable="true"
-				android:id="@+id/wk_chat_me_message"
+				android:id="@+id/wk_chat_message"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textSize="16sp"
@@ -53,7 +53,7 @@
 		</LinearLayout>
 
 		<com.android.volley.toolbox.NetworkImageView
-			android:id="@+id/wk_chat_image_right"
+			android:id="@+id/wk_chat_image"
 			android:layout_width="30dp"
 			android:layout_height="30dp"
 			android:focusable="false"
@@ -65,7 +65,7 @@
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content"
 		android:clickable="false"
-		android:id="@+id/chatdialogrightitemCheckBox"
+		android:id="@+id/wk_chat_checkbox"
 		android:visibility="gone"
 		android:layout_alignParentRight="true"/>
 
@@ -76,7 +76,7 @@
 		android:textSize="10sp"
 		android:layout_alignParentTop="true"
 		android:layout_centerHorizontal="true"
-		android:id="@+id/chatdialogrightTime"/>
+		android:id="@+id/wk_chat_time"/>
 
 </RelativeLayout>
 

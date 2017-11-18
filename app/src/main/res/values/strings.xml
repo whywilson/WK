@@ -302,5 +302,7 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="pleaseChoose">请选择</string>
     <string name="add">新增</string>
+    <string name="alert">警告</string>
+    <string name="confirm_delete">确认删除</string>
 
 </resources>

@@ -218,9 +218,10 @@ public class ChatFragment extends Fragment {
             @Override
             public boolean onLongClick(View p1) {
                 new MaterialDialog.Builder(getActivity())
-                        .title("Alert")
-                        .content("Are you going to delete " + msgAcceptPerson)
+                        .title(R.string.alert)
+                        .content(getString(R.string.confirm_delete) + mChatContact.getText() + " ?")
                         .positiveText(R.string.confirm)
+                        .negativeColor(R.color.colorPrimary)
                         .negativeText(R.string.cancel)
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
 
@@ -243,6 +244,7 @@ public class ChatFragment extends Fragment {
                                         }
                                         editor.apply();
                                         updateChatDialog();
+                                        mChatContact.setText(msgAcceptPerson);
                                     } else {
                                         ToastUtil(getString(R.string.wkCantDothat));
                                     }
@@ -404,23 +406,18 @@ public class ChatFragment extends Fragment {
             }
 
         });
-		chatAdaper.setRecyclerViewOnItemClickListener(new ChatAdapter.RecyclerViewOnItemClickListener(){
+        chatAdaper.setOnItemListener(new ChatAdapter.OnItemListener() {
+            @Override
+            public void OnItemClickListener(int position, ChatAdapter.ViewHolder vh) {
 
-				@Override
-				public void onItemClickListener(View view, int position)
-				{
-					view.getTag(position);
-				}
+            }
 
-				@Override
-				public boolean onItemLongClickListener(View view, int position)
-				{
-					// TODO: Implement this method
-					return false;
-				}
-			});
-		
-		
+            @Override
+            public boolean OnItemLongClickListener(int position, ChatAdapter.ViewHolder vh) {
+                return false;
+            }
+        });
+
         super.onActivityCreated(savedInstanceState);
     }
 
