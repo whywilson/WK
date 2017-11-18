@@ -214,7 +214,7 @@ public class ChatFragment extends Fragment {
                     editor.putBoolean(SettingUtil.CONTACTS_TIPS, false);
                     editor.apply();
                 }
-                ContactDialog();
+                showContactDialog();
             }
         });
         mChatContactBar.setOnLongClickListener(new OnLongClickListener() {
@@ -546,7 +546,7 @@ public class ChatFragment extends Fragment {
     }
 
 
-    private void ContactDialog() {
+    private void showContactDialog() {
         contactList.add(getResources().getString(R.string.allContacts));
         contactList.add(phoneAlias);
         try {
@@ -779,7 +779,7 @@ public class ChatFragment extends Fragment {
 //                    clb.setTime(c.getTime());
 //                    mChatDialogLists.add(clb);
 //                }
-//                chatAdaper.notifyDataSetChanged();
+                chatAdaper.notifyDataSetChanged();
 ////                chatAdaper.notifyItemInserted(mChatDialogLists.size() - 1);
 //                //todo 滑动啥
                 chatRecyclerView.smoothScrollToPosition(chatAdaper.getItemCount());

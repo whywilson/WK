@@ -209,7 +209,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     public void addItem(chatListBean data) {
         ChatFragment.mChatDialogLists.add(data);
-        items.add(data);
+        //items.add(data);
         notifyItemInserted(items.size());
     }
 
