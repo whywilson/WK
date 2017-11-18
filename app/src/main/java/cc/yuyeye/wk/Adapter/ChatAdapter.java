@@ -37,7 +37,7 @@ import static cc.yuyeye.wk.MainActivity.getCurrentTime;
 import android.widget.AdapterView.*;
 
 
-public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder_MSG> {
 
     private List<chatListBean> items;
     private Context context;
@@ -58,55 +58,19 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         mInflater = LayoutInflater.from(context);
         selectAllItem(false);
     }
-
-    public class ViewHolder_MSG_T extends RecyclerView.ViewHolder {
-        private TextView wk_chat_message;
-        private TextView wk_chat_name;
-        private TextView wk_chat_time;
-        private NetworkImageView wk_chat_image;
-        private AppCompatCheckBox wk_chat_checkbox;
-        private RelativeLayout wk_chat_layout;
-        private View itemView;
-		public chatListBean mItem;
-        public int viewType;
-
-        public ViewHolder_MSG_T(View view) {
-            super(view);
-            this.itemView = view;
-			wk_chat_layout = (RelativeLayout) view.findViewById(R.id.chatdialogrightitemRelativeLayout1);
-			wk_chat_message = (TextView) view.findViewById(R.id.wk_chat_me_message);
-			wk_chat_name = (TextView) view.findViewById(R.id.wk_chat_right_name);
-			wk_chat_checkbox = (AppCompatCheckBox) view.findViewById(R.id.chatdialogrightitemCheckBox);
-			wk_chat_time = (TextView) view.findViewById(R.id.chatdialogrightTime);
-			wk_chat_image = (NetworkImageView) view.findViewById(R.id.wk_chat_image_right);
-			wk_chat_image.setDefaultImageResId(R.drawable.doraemon_0);
-			wk_chat_message.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						if (!isActionMode) {
-							ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-							cmb.setText(wk_chat_message.getText().toString());
-							ToastUtil.showSimpleToast(context.getString(R.string.copied), 100);
-						} else {
-							//setSelectItem(position);
-						}
-					}
-				});
-        }
-    }
 	
-	public class ViewHolder_MSG_R extends RecyclerView.ViewHolder {
-        private TextView wk_chat_message;
-        private TextView wk_chat_name;
-        private TextView wk_chat_time;
-        private NetworkImageView wk_chat_image;
-        private AppCompatCheckBox wk_chat_checkbox;
-        private RelativeLayout wk_chat_layout;
-        private View itemView;
-		public chatListBean mItem;
-        public int viewType;
+	public class ViewHolder_MSG extends RecyclerView.ViewHolder {
+        public TextView wk_chat_message;
+        public TextView wk_chat_name;
+        TextView wk_chat_time;
+        public NetworkImageView wk_chat_image;
+        AppCompatCheckBox wk_chat_checkbox;
+        RelativeLayout wk_chat_layout;
+        View itemView;
+		chatListBean mItem;
+        int viewType;
 
-        public ViewHolder_MSG_R(View view) {
+        public ViewHolder_MSG(View view) {
             super(view);
             this.itemView = view;
 			wk_chat_layout = (RelativeLayout) view.findViewById(R.id.chatdialogleftitemRelativeLayout1);
@@ -114,90 +78,67 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 			wk_chat_name = (TextView) view.findViewById(R.id.wk_chat_left_name);
 			wk_chat_time = (TextView) view.findViewById(R.id.chatdialogleftTime);
 			wk_chat_image = (NetworkImageView) view.findViewById(R.id.wk_chat_image_left);
-			wk_chat_image.setDefaultImageResId(R.drawable.ali_0);
 			wk_chat_checkbox = (AppCompatCheckBox) view.findViewById(R.id.chatdialogleftitemCheckBox);
-			wk_chat_message.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						if (!isActionMode) {
-							ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-							cmb.setText(wk_chat_message.getText().toString());
-							ToastUtil.showSimpleToast(context.getString(R.string.copied), 100);
-						} else {
-							//setSelectItem(position);
-						}
-					}
-				});
         }
     }
 	
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ChatAdapter.ViewHolder_MSG onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == msgViewType.MSG_SEND) {
-			return new ViewHolder_MSG_T(LayoutInflater.from(context).inflate(R.layout.chat_dialog_right_item, parent, false));
+			return new ViewHolder_MSG(LayoutInflater.from(context).inflate(R.layout.chat_dialog_right_item, parent, false));
         } else {
-			return new ViewHolder_MSG_R(LayoutInflater.from(context).inflate(R.layout.chat_dialog_left_item, parent, false));
+			return new ViewHolder_MSG(LayoutInflater.from(context).inflate(R.layout.chat_dialog_left_item, parent, false));
 			
         }
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-		switch (holder.getItemViewType()) {
-			case msgViewType.MSG_SEND:
-				ViewHolder_MSG_T vh = (ViewHolder_MSG_T)holder;
-				vh.mItem = items.get(position);
-				vh.wk_chat_name.setText(items.get(position).getcSend());
-				vh.wk_chat_message.setText(items.get(position).getMsgContent());
-				vh.wk_chat_image.setImageUrl(items.get(position).getIconUrl(), loader);
-				try {
-					chatListBean entity = items.get(position);
-					if (items.size() > 1) {
-						chatListBean entity_before = items.get(Math.abs(position - 1));
-						if (entity.getTime().substring(10, 16).equals(entity_before.getTime().substring(10, 16)) && position != 0) {
-							vh.wk_chat_time.setVisibility(TextView.GONE);
-						} else {
-							if (entity.getTime().substring(0, 10).equals(getCurrentTime().substring(0, 10))) {
-								vh.wk_chat_time.setText(entity.getTime().substring(10, 16));
-							} else {
-								vh.wk_chat_time.setText(entity.getTime().substring(0, 16));
-							}
-						}
+    public void onBindViewHolder(final ChatAdapter.ViewHolder_MSG vh, int position) {
+		//final ViewHolder_MSG vh = (ViewHolder_MSG)holder;
+		vh.wk_chat_message.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					if (!isActionMode) {
+						ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+						cmb.setText(vh.wk_chat_message.getText().toString());
+						ToastUtil.showSimpleToast(context.getString(R.string.copied), 100);
+					} else {
+						//setSelectItem(position);
+					}
+				}
+			});
+		if(getItemViewType(position) == msgViewType.MSG_SEND)
+		{
+			vh.wk_chat_image.setDefaultImageResId(R.drawable.ali_0);
+		}else
+		{
+			vh.wk_chat_image.setDefaultImageResId(R.drawable.account);
+		}
+		
+		
+		vh.mItem = items.get(position);
+		vh.wk_chat_name.setText(items.get(position).getcSend());
+		vh.wk_chat_message.setText(items.get(position).getMsgContent());
+		vh.wk_chat_image.setImageUrl(items.get(position).getIconUrl(), loader);
+		try {
+			chatListBean entity = items.get(position);
+			if (items.size() > 1) {
+				chatListBean entity_before = items.get(Math.abs(position - 1));
+				if (entity.getTime().substring(10, 16).equals(entity_before.getTime().substring(10, 16)) && position != 0) {
+					vh.wk_chat_time.setVisibility(TextView.GONE);
+				} else {
+					if (entity.getTime().substring(0, 10).equals(getCurrentTime().substring(0, 10))) {
+						vh.wk_chat_time.setText(entity.getTime().substring(10, 16));
 					} else {
 						vh.wk_chat_time.setText(entity.getTime().substring(0, 16));
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
-				break;
-			case msgViewType.MSG_COME:
-				ViewHolder_MSG_R vhr = (ViewHolder_MSG_R)holder;
-				vhr.mItem = items.get(position);
-				vhr.mItem = items.get(position);
-				vhr.wk_chat_name.setText(items.get(position).getcSend());
-				vhr.wk_chat_message.setText(items.get(position).getMsgContent());
-				vhr.wk_chat_image.setImageUrl(items.get(position).getIconUrl(), loader);
-				try {
-					chatListBean entity = items.get(position);
-					if (items.size() > 1) {
-						chatListBean entity_before = items.get(Math.abs(position - 1));
-						if (entity.getTime().substring(10, 16).equals(entity_before.getTime().substring(10, 16)) && position != 0) {
-							vhr.wk_chat_time.setVisibility(TextView.GONE);
-						} else {
-							if (entity.getTime().substring(0, 10).equals(getCurrentTime().substring(0, 10))) {
-								vhr.wk_chat_time.setText(entity.getTime().substring(10, 16));
-							} else {
-								vhr.wk_chat_time.setText(entity.getTime().substring(0, 16));
-							}
-						}
-					} else {
-						vhr.wk_chat_time.setText(entity.getTime().substring(0, 16));
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				break;
+			} else {
+				vh.wk_chat_time.setText(entity.getTime().substring(0, 16));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 //        if (isActionMode) {
