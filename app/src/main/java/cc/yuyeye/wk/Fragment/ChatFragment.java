@@ -139,14 +139,7 @@ public class ChatFragment extends Fragment {
         qq = tencentUtil.getQqNumb();
 
         phoneAlias = sharedPreferences.getString(SettingUtil.ID_KEY, "");
-        if (phoneAlias.equals("")) {
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            startActivity(intent);
-        } else {
-            chatDb = new ChatDb(getActivity(), true);
-            initChatDialog();
-            chatAdaper = new ChatAdapter(getActivity(), mChatDialogLists);
-        }
+        
         chatMsgHandler = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 int what = msg.what;
@@ -175,6 +168,15 @@ public class ChatFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+		if (phoneAlias.equals("")) {
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
+        } else {
+            chatDb = new ChatDb(getActivity(), true);
+            initChatDialog();
+            chatAdaper = new ChatAdapter(getActivity(), mChatDialogLists);
+        }
+		
         return inflater.inflate(R.layout.tab_chat, container, false);
     }
 
@@ -282,12 +284,7 @@ public class ChatFragment extends Fragment {
                                     }
                                     return super.calculateTimeForScrolling(dx);
                                 }
-
-//                                @Override
-//                                public PointF computeScrollVectorForPosition(int targetPosition) {
-//                                    return mLayoutManager.computeScrollVectorForPosition(targetPosition);
-//                                }
-                            };
+					};
                     linearSmoothScroller.setTargetPosition(position);
                     startSmoothScroll(linearSmoothScroller);
                 }
@@ -749,7 +746,17 @@ public class ChatFragment extends Fragment {
 
     public void updateChatDialog() {
         checkSendPerson();
-        initChatDialog();
+        //initChatDialog();
+		try {
+            mChatDialogLists = chatDb.getChatRecord(phoneAlias, sendPerson, phoneAlias);
+            chatAdaper = new ChatAdapter(getActivity(), mChatDialogLists);
+			chatRecyclerView.setAdapter(chatAdaper);
+			chatRecyclerView.smoothScrollToPosition(chatAdaper.getItemCount());
+			chatMsgHandler.sendEmptyMessage(-1);
+        } catch (Exception e) {
+            LogUtil.e("init", "initChat Error " + e);
+        }
+		
         chatAdaper.notifyDataSetChanged();
         chatMsgHandler.sendEmptyMessage(-1);
         mChatNetType.setText("");
