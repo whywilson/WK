@@ -164,6 +164,7 @@ public class Common extends Application {
                     Matcher matcherName = patternName.matcher(result);
                     Matcher matcherCode = patternCode.matcher(result);
                     try {
+						Log.i(TAG, "result " + result);
                         if (matcherCode.find() && matcherName.find()) {
                             serverVersion = Integer.parseInt(removeStr(removeStr(matcherCode.group(0), "versionCode"), " "));
                             serverVersionName = removeStr(removeStr(matcherName.group(0), "versionName"), "'");
@@ -215,6 +216,7 @@ public class Common extends Application {
                     Pattern patternLog = Pattern.compile(serverVersionName + "[\\s\\S]*?```([\\s\\S]*?)```");
                     Matcher matcherLog = patternLog.matcher(result);
                     try {
+						Log.i(TAG, " log result " + result);
                         if (matcherLog.find()) {
                             updateLog = matcherLog.group(0);
                             String[] logArray = updateLog.split("```");

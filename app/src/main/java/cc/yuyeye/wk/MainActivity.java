@@ -50,8 +50,10 @@ import static cc.yuyeye.wk.Fragment.ChatFragment.mChatHeaderImage;
 import static cc.yuyeye.wk.Fragment.ChatFragment.mChatMsgView;
 import static cc.yuyeye.wk.Fragment.ChatFragment.mChatTitleTime;
 import android.support.v4.app.*;
+import cc.yuyeye.wk.Util.*;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
     public static SharedPreferences sharedPreferences;
     public static String sendPerson = "所有人";
     private SectionsPagerAdapter mSectionsPagerAdapter;
@@ -69,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+	{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_tab);
 
@@ -89,64 +92,90 @@ public class MainActivity extends AppCompatActivity {
         IMEI = telephonyManager.getDeviceId();
         checkPhoneAlias();
         checkSendPerson();
-        if (phoneAlias != null) {
+        if (phoneAlias != null)
+		{
             chatDb = new ChatDb(this, true);
         }
         initImageLoader();
-    }
+
+		if (InternetUtil.getNetworkState(this.getBaseContext()) != 0)
+		{
+            new Thread(Common.runWk_version).start();
+            if (Common.isUpdate)
+			{
+                ToastUtil.showSimpleToast("Update");
+            }
+            if (!phoneAlias.equals(""))
+			{
+                new Thread(runWk_login).start();
+            }
+
+        } 
+	}
 
     @Override
-    protected void onResume() {
-        if (InternetUtil.getNetworkState(this) != 0) {
+    protected void onResume()
+	{
+        if (InternetUtil.getNetworkState(this) != 0)
+		{
             new Thread(runWk_login).start();
         }
 
-		if(IMEI == "0"){
-			ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_PHONE_STATE},1);
+		if (IMEI == "0")
+		{
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
 		}
         isForeground = true;
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-            @Override
-            public void onPageScrolled(int p1, float p2, int p3) {
+				@Override
+				public void onPageScrolled(int p1, float p2, int p3)
+				{
 
-            }
+				}
 
-            @Override
-            public void onPageSelected(int p1) {
+				@Override
+				public void onPageSelected(int p1)
+				{
 //					if(p1 != 1){
 //						tabLayout.setVisibility(View.VISIBLE);
 //					}
-            }
+				}
 
-            @Override
-            public void onPageScrollStateChanged(int p1) {
+				@Override
+				public void onPageScrollStateChanged(int p1)
+				{
 //					if(p1 == 1){
 //						tabLayout.setVisibility(View.VISIBLE);
 //					}else{
 //						tabLayout.setVisibility(View.INVISIBLE);
 //					}
-            }
-        });
+				}
+			});
         super.onResume();
     }
 
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+	{
         super.onPause();
         isForeground = false;
     }
 
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentPagerAdapter
+	{
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        public SectionsPagerAdapter(FragmentManager fm)
+		{
             super(fm);
         }
 
         @Override
-        public Fragment getItem(int position) {
-            switch (position) {
+        public Fragment getItem(int position)
+		{
+            switch (position)
+			{
                 case 0:
                     return ChatFragment.newInstance();
                 case 1:
@@ -159,13 +188,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public int getCount() {
+        public int getCount()
+		{
             return 3;
         }
 
         @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
+        public CharSequence getPageTitle(int position)
+		{
+            switch (position)
+			{
                 case 0:
                     return "问问";
                 case 1:
@@ -177,34 +209,42 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static String getCurrentTime() {
+    public static String getCurrentTime()
+	{
         return sDateFormat.format(new Date());
     }
 
-    public static void SaveChatRecord(String alias, String send, String receive, String msg) {
+    public static void SaveChatRecord(String alias, String send, String receive, String msg)
+	{
         String currentTime = getCurrentTime();
         chatDb.insert(alias, send, receive, currentTime, msg);
     }
 
-    public void checkPhoneAlias() {
+    public void checkPhoneAlias()
+	{
         phoneAlias = sharedPreferences.getString(SettingUtil.ID_KEY, "");
-        if (phoneAlias.equals("")) {
+        if (phoneAlias.equals(""))
+		{
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
     }
 
-    public static void checkSendPerson() {
+    public static void checkSendPerson()
+	{
         sendPerson = sharedPreferences.getString("sendPerson", Common.getContext().getResources().getString(R.string.allContacts));
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+    public boolean dispatchTouchEvent(MotionEvent ev)
+	{
+        if (ev.getAction() == MotionEvent.ACTION_DOWN)
+		{
             //View v = getCurrentFocus();
             View v = mChatMsgView;
             //消息编辑框与标题栏图标点击不失去焦点
-            if (isShouldHideKeyboard(v, ev) && (isShouldHideKeyboard(mChatHeaderImage, ev) | isShouldHideKeyboard(mChatTitleTime, ev))) {
+            if (isShouldHideKeyboard(v, ev) && (isShouldHideKeyboard(mChatHeaderImage, ev) | isShouldHideKeyboard(mChatTitleTime, ev)))
+			{
                 hideKeyboard(v.getWindowToken());
                 mViewPager.setFocusable(true);
                 mViewPager.setFocusableInTouchMode(true);
@@ -214,29 +254,34 @@ public class MainActivity extends AppCompatActivity {
         return super.dispatchTouchEvent(ev);
     }
 
-    private boolean isShouldHideKeyboard(View v, MotionEvent event) {
-        if ((v instanceof EditText) || v != null) {
+    private boolean isShouldHideKeyboard(View v, MotionEvent event)
+	{
+        if ((v instanceof EditText) || v != null)
+		{
             int[] l = {0, 0};
             v.getLocationInWindow(l);
             int left = l[0],
-                    top = l[1],
-                    bottom = top + v.getHeight(),
-                    right = left + v.getWidth();
+				top = l[1],
+				bottom = top + v.getHeight(),
+				right = left + v.getWidth();
             return !(event.getRawX() > left && event.getRawX() < right
-                    && event.getRawY() > top && event.getRawY() < bottom);
+				&& event.getRawY() > top && event.getRawY() < bottom);
         }
         return false;
     }
 
-    private void hideKeyboard(IBinder token) {
-        if (token != null) {
+    private void hideKeyboard(IBinder token)
+	{
+        if (token != null)
+		{
             InputMethodManager im = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             im.hideSoftInputFromWindow(token, InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
 
     public Runnable runWk_login = new Runnable() {
-        public void run() {
+        public void run()
+		{
             //获取当前时间
             SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.PRC);
             String currentTime = sDateFormat.format(new java.util.Date());
@@ -253,27 +298,32 @@ public class MainActivity extends AppCompatActivity {
             nameValuePairs.add(new BasicNameValuePair("vname", Common.localVersionName));
             nameValuePairs.add(new BasicNameValuePair("nettype", nettype));
             nameValuePairs.add(new BasicNameValuePair("ip", netIp));
-            try {
+            try
+			{
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpPost httppost = new HttpPost(wkRunnable.wk_loginUrl);
                 httppost.setEntity(new UrlEncodedFormEntity((nameValuePairs), "UTF_8"));
                 httpclient.execute(httppost);
-            } catch (Exception e) {
+            }
+			catch (Exception e)
+			{
                 LogUtil.e("wkrunnable", "Login错误 " + e.toString());
             }
         }
     };
 
-    private void initImageLoader() {
+    private void initImageLoader()
+	{
         mQueue = Volley.newRequestQueue(this);
         mImageCache = new BitmapCache();
         mImageLoader = new ImageLoader(mQueue, mImageCache);
     }
-	
-	public static boolean isWkOrNot() {
+
+	public static boolean isWkOrNot()
+	{
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(Common.getContext());
         String wk = sp.getString(SettingUtil.ID_KEY, "");
         return wk.equals("Wilson") || wk.equals("wilson") || wk.equals("Karina") || wk.equals("karina");
     }
-	
+
 }
