@@ -3,7 +3,8 @@ local.properties
 .gradle/
 .idea/
 *.iml
-build/
+build
+app/build
 *.zip
 gradle/
 /app/app.iml

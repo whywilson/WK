@@ -9,7 +9,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 22
-        versionName '20170928'
+        versionName '20171120'
         vectorDrawables.useSupportLibrary = true
     }
     lintOptions {
