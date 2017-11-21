@@ -1,50 +1,42 @@
 package cc.yuyeye.wk;
 
-import android.app.Application;
-import android.app.Notification;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.WindowManager;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import cc.yuyeye.wk.Util.SettingUtil;
-import cn.jpush.android.api.BasicPushNotificationBuilder;
-import cn.jpush.android.api.CustomPushNotificationBuilder;
-import cn.jpush.android.api.JPushInterface;
-import cn.jpush.android.api.TagAliasCallback;
+import android.app.*;
+import android.content.*;
+import android.content.pm.*;
+import android.content.pm.PackageManager.*;
+import android.os.*;
+import android.preference.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
+import cc.yuyeye.wk.Service.*;
+import cc.yuyeye.wk.Util.*;
+import cn.jpush.android.api.*;
+import com.afollestad.materialdialogs.*;
+import java.io.*;
+import java.util.*;
+import java.util.regex.*;
+import org.apache.http.*;
+import org.apache.http.client.*;
+import org.apache.http.client.entity.*;
+import org.apache.http.client.methods.*;
+import org.apache.http.impl.client.*;
+import org.apache.http.message.*;
+import org.json.*;
 
 
-public class Common extends Application {
-    public static int localVersion;
-    public static String localVersionName = "";
-    public static int serverVersion;
-    public static String serverVersionName = "0.0";
-    public static String updateLog;
+public class Common extends Application
+{
+	public static String wk_url = "https://api.yuyeye.cc/wk_url.php";
+	public static String url_domain;
+	public static String url_login;
+	public static String url_version;
+	public static String new_version_apk;
+	public static int new_version_code;
+	public static String new_version_name;
+	public static String new_version_log;
     public static Boolean isUpdate = false;
     public static Boolean isBetaUpdate = false;
-    public static String apkDevUrl = "https://raw.githubusercontent.com/wilsonqq/WK/Dev/app/build.gradle";
-    public static String apkMasterUrl = "https://raw.githubusercontent.com/wilsonqq/WK/master/app/build.gradle";
-    public static String logDevUrl = "https://raw.githubusercontent.com/wilsonqq/WK/Dev/README.md";
-    public static String logMasterUrl = "https://raw.githubusercontent.com/wilsonqq/WK/master/README.md";
-    public static String gitVersionName;
-    public static String gitVersionCode;
     public static String TAG = "WkApplication";
     public static String downloadDir = "Download/";
     public static Context context;
@@ -55,36 +47,33 @@ public class Common extends Application {
     private CustomPushNotificationBuilder vibrateBuilder;
     private WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams();
 
-    public WindowManager.LayoutParams getWkwmParams() {
+    public WindowManager.LayoutParams getWkwmParams()
+	{
         return wmParams;
     }
 
 
     @Override
-    public void onCreate() {
+    public void onCreate()
+	{
         super.onCreate();
         context = getApplicationContext();
-        try {
-            PackageInfo packageInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
-            localVersion = packageInfo.versionCode;
-            localVersionName = packageInfo.versionName;
-            Log.i(TAG, "Local Version " + localVersion + "  ----  " + localVersionName);
-        } catch (NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        //new Thread(runWk_version).start();
+        
         context = getApplicationContext();
         startSerSharePre = PreferenceManager.getDefaultSharedPreferences(this);
         startJPush();
     }
 
-    public static Context getContext() {
+    public static Context getContext()
+	{
         return context;
     }
 
-    public void startJPush() {
+    public void startJPush()
+	{
         phoneAlias = startSerSharePre.getString(SettingUtil.ID_KEY, "");
-        if (phoneAlias != "") {
+        if (phoneAlias != "")
+		{
             JPushInterface.init(this);
             vibrateBuilder = new CustomPushNotificationBuilder(this, R.layout.customer_notitfication_layout, R.id.icon, R.id.title, R.id.text);
             vibrateBuilder.statusBarDrawable = R.drawable.ic_local_florist_white_48dp;
@@ -101,15 +90,17 @@ public class Common extends Application {
             JPushInterface.setLatestNotificationNumber(this, 3);
 
             JPushInterface.setAlias(this, phoneAlias, new TagAliasCallback() {
-                @Override
-                public void gotResult(int i, String s, Set<String> set) {
-                    Log.d("JPush", "Set Tag result is " + s);
-                }
-            });
+					@Override
+					public void gotResult(int i, String s, Set<String> set)
+					{
+						Log.d("JPush", "Set Tag result is " + s);
+					}
+				});
         }
     }
 
-    public static StringBuilder inputStreamToString(InputStream is) {
+    public static StringBuilder inputStreamToString(InputStream is)
+	{
         String line;
         StringBuilder total = new StringBuilder();
 
@@ -117,11 +108,15 @@ public class Common extends Application {
         BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 
         // Read response until the end
-        try {
-            while ((line = rd.readLine()) != null) {
+        try
+		{
+            while ((line = rd.readLine()) != null)
+			{
                 total.append(line);
             }
-        } catch (IOException e) {
+        }
+		catch (IOException e)
+		{
             e.printStackTrace();
         }
 
@@ -129,119 +124,356 @@ public class Common extends Application {
         return total;
     }
 
-    public static String removeStr(String a, String b) {
+    public static String removeStr(String a, String b)
+	{
         return a.replaceAll(b, "");
     }
 
-    public static Runnable runWk_version = new Runnable() {
-        public void run() {
+	public static class url extends AsyncTask<Integer, Integer, String>
+	{
 
-            try {
+        public String result;
+        public InputStream is;
+        public ArrayList<NameValuePair> nameValuePairs;
 
-                //第一步：得到HttpClient对象，代表一个Http客户端
-                HttpClient getVersionClient = new DefaultHttpClient();
-                //第二步：得到HttpGet对象，代表请求的具体内容
-                String apkUrl;
-                if (startSerSharePre.getBoolean(SettingUtil.DEV_UPDATE_KEY, false)) {
-                    apkUrl = apkDevUrl;
-                    Log.i(TAG, "Dev Version");
-                } else {
-                    apkUrl = apkMasterUrl;
-                }
-                HttpGet request = new HttpGet(apkUrl);
-                //第三步:执行请求。使用HttpClient的execute方法，执行刚才构建的请求
-                HttpResponse response = getVersionClient.execute(request);
-                //判断请求是否成功
-                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    Log.i(TAG, "请求服务器端成功 " + apkUrl);
-                    //获得输入流
-                    //第四步: 获取HttpResponse中的数据
-                    InputStream inStream = response.getEntity().getContent();
-                    String result = inputStreamToString(inStream).toString();
-//                    Log.i(TAG, "请求内容为 " + result);
-                    Pattern patternCode = Pattern.compile("versionCode (.*?) ");
-                    Pattern patternName = Pattern.compile("versionName '(.*?)'");
-                    Matcher matcherName = patternName.matcher(result);
-                    Matcher matcherCode = patternCode.matcher(result);
-                    try {
-						Log.i(TAG, "result " + result);
-                        if (matcherCode.find() && matcherName.find()) {
-                            serverVersion = Integer.parseInt(removeStr(removeStr(matcherCode.group(0), "versionCode"), " "));
-                            serverVersionName = removeStr(removeStr(matcherName.group(0), "versionName"), "'");
-                            Log.i(TAG, "Github Version " + serverVersion + " --- " + serverVersionName);
+        @Override
+        protected void onPreExecute()
+		{
+            result = "";
 
-                            if (localVersion < serverVersion) {
-                                isUpdate = true;
-                                Log.i(TAG, " Update Release");
-                            } else {
-                                isBetaUpdate = Double.parseDouble(localVersionName) < Double.parseDouble(serverVersionName);
-                                if (isBetaUpdate) {
-                                    Log.i(TAG, " Beta Release");
-                                }
-                                isUpdate = false;
-                            }
+            nameValuePairs = new ArrayList<>();
+            nameValuePairs.add(new BasicNameValuePair("imei", MainActivity.IMEI));
 
-                        } else {
-                            Log.i(TAG, "匹配失败");
-                        }
-                    } catch (Exception e) {
-                        Log.i(TAG, "匹配失败 " + e);
-                        e.printStackTrace();
-                    }
-
-                    //关闭输入流
-                    inStream.close();
-                } else {
-                    Log.i(TAG, "请求服务器Version失败");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            try {
-                HttpClient getLogClient = new DefaultHttpClient();
-                String logUrl;
-                if (startSerSharePre.getBoolean(SettingUtil.DEV_UPDATE_KEY, false)) {
-                    logUrl = logDevUrl;
-                }else {
-                    logUrl = logMasterUrl;
-                }
-
-                HttpGet request = new HttpGet(logUrl);
-                HttpResponse response = getLogClient.execute(request);
-                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    Log.i(TAG, "请求服务器端成功 " + logUrl);
-                    InputStream inStream = response.getEntity().getContent();
-                    String result = inputStreamToString(inStream).toString();
-                    Pattern patternLog = Pattern.compile(serverVersionName + "[\\s\\S]*?```([\\s\\S]*?)```");
-                    Matcher matcherLog = patternLog.matcher(result);
-                    try {
-						Log.i(TAG, " log result " + result);
-                        if (matcherLog.find()) {
-                            updateLog = matcherLog.group(0);
-                            String[] logArray = updateLog.split("```");
-                            updateLog = logArray[1];
-                        } else {
-                            Log.i(TAG, "匹配失败");
-                        }
-                    } catch (Exception e) {
-                        Log.i(TAG, "匹配失败 " + e);
-                        e.printStackTrace();
-                    }
-
-                    //关闭输入流
-                    inStream.close();
-                } else {
-                    Log.i(TAG, "请求服务器端Log失败");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            is = null;
+            super.onPreExecute();
         }
-    };
+
+        @Override
+        protected String doInBackground(Integer[] params)
+		{
+            try
+			{
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpPost httppost = new HttpPost(wk_url);
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity entity = response.getEntity();
+                is = entity.getContent();
+            }
+			catch (Exception e)
+			{
+                Log.e(TAG, "httpClient" + e.toString());
+            }
+
+            try
+			{
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"), 8);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null)
+				{
+                    sb.append(line + "\n");
+                }
+                is.close();
+                result = sb.toString();
+            }
+			catch (Exception e)
+			{
+                Log.e(TAG, "reader" + e.toString());
+            }
+
+            try
+			{
+                JSONArray jArray = new JSONArray(result);
+                JSONObject jsonObj = jArray.getJSONObject(0);
+				url_domain = jsonObj.getString("domain");
+                url_login = url_domain + jsonObj.getString("login");
+				url_version = url_domain + jsonObj.getString("version");
+				new_version_code = jsonObj.getInt("code");
+                new_version_name = jsonObj.getString("name");
+            }
+			catch (JSONException e)
+			{
+                Log.e(TAG, "transfer " + e.toString());
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+		{
+			if(new_version_code > getVersionCode()
+			   |(Integer.parseInt(new_version_name) > Integer.parseInt(getVersionName()) 
+			 	  &&startSerSharePre.getBoolean(SettingUtil.DEV_UPDATE_KEY, false)))
+			{
+				new version(MainActivity.mContext).execute();
+			}
+            
+            new login().execute();
+
+            super.onPostExecute(result);
+        }
+    }
+
+	public static class login extends AsyncTask<Integer, Integer, String>
+	{
+
+        public String result;
+        public InputStream is;
+        public ArrayList<NameValuePair> nameValuePairs;
+		public int user_id = 0;
+
+        @Override
+        protected void onPreExecute()
+		{
+            result = "";
+
+            is = null;
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(Integer[] params)
+		{
+            try
+			{
+				String nettype = InternetUtil.getNetworkState(Common.getContext()) + "";
+				String localIp = InternetUtil.getLocalIp(Common.getContext()) + "";
+				String netIp = InternetUtil.getNetIp() + "";
+				nameValuePairs = new ArrayList<>();
+				nameValuePairs.add(new BasicNameValuePair("imei", MainActivity.IMEI));
+				nameValuePairs.add(new BasicNameValuePair("alias", phoneAlias));
+				nameValuePairs.add(new BasicNameValuePair("version", Integer.toString(getVersionCode())));
+				nameValuePairs.add(new BasicNameValuePair("vname", getVersionName()));
+				nameValuePairs.add(new BasicNameValuePair("nettype", nettype));
+				nameValuePairs.add(new BasicNameValuePair("local_ip", localIp));
+				nameValuePairs.add(new BasicNameValuePair("ip", netIp));
 
 
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpPost httppost = new HttpPost(url_login);
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity entity = response.getEntity();
+                is = entity.getContent();
+            }
+			catch (Exception e)
+			{
+                Log.e(TAG, "httpClient" + e.toString());
+            }
+
+            try
+			{
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"), 8);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null)
+				{
+                    sb.append(line + "\n");
+                }
+                is.close();
+                result = sb.toString();
+            }
+			catch (Exception e)
+			{
+                Log.e(TAG, "reader" + e.toString());
+            }
+
+            try
+			{
+                JSONArray jArray = new JSONArray(result);
+                JSONObject jsonObj = jArray.getJSONObject(0);
+
+                user_id = jsonObj.getInt("id");
+
+            }
+			catch (JSONException e)
+			{
+                Log.e(TAG, "transfer " + e.toString());
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+		{
+            super.onPostExecute(result);
+        }
+    }
+
+	public static class version extends AsyncTask<Integer, Integer, String>
+	{
+		public Context context;
+		public MaterialDialog check_version_dialog;
+        public String result;
+        public InputStream is;
+        public ArrayList<NameValuePair> nameValuePairs;
+		public int user_id = 0;
+
+		public version(Context context)
+		{
+			super();
+			this.context = context;
+		}
+
+        @Override
+        protected void onPreExecute()
+		{
+            result = "";
+			check_version_dialog = new MaterialDialog.Builder(context)
+				.title(R.string.checking)
+				.progress(true, 1)
+				.content(R.string.keep_online)
+				.build();
+            check_version_dialog.show();
+            is = null;
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(Integer[] params)
+		{
+            try
+			{
+				nameValuePairs = new ArrayList<>();
+				nameValuePairs.add(new BasicNameValuePair("imei", MainActivity.IMEI));
+
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpPost httppost = new HttpPost(url_version);
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity entity = response.getEntity();
+                is = entity.getContent();
+            }
+			catch (Exception e)
+			{
+                Log.e(TAG, "httpClient" + e.toString());
+            }
+
+            try
+			{
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"), 8);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null)
+				{
+                    sb.append(line + "\n");
+                }
+                is.close();
+                result = sb.toString();
+            }
+			catch (Exception e)
+			{
+                Log.e(TAG, "reader" + e.toString());
+            }
+
+            try
+			{
+                JSONArray jArray = new JSONArray(result);
+                JSONObject jsonObj = jArray.getJSONObject(0);
+
+                new_version_code = jsonObj.getInt("version");
+				new_version_name = jsonObj.getString("vname");
+				new_version_log = jsonObj.getString("log");
+				new_version_apk = jsonObj.getString("apk");
+            }
+			catch (JSONException e)
+			{
+                Log.e(TAG, "transfer " + e.toString());
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+		{
+			MaterialDialog update_log_dialog = new MaterialDialog.Builder(context)
+				.title(R.string.found_new_beta_version)
+				.content(new_version_log)
+				.positiveColorRes(R.color.colorPrimary)
+				.negativeColorRes(R.color.colorAccent)
+				.positiveText(R.string.update)
+				.negativeText(R.string.cancel)
+				.onPositive(new MaterialDialog.SingleButtonCallback(){
+
+					@Override
+					public void onClick(MaterialDialog p1, DialogAction p2)
+					{
+						Intent updateIntent = new Intent(MainActivity.mContext, UpdateService.class);
+						updateIntent.putExtra("app_name", context.getResources().getString(R.string.app_name));
+						MainActivity.mContext.startService(updateIntent);
+					}
+				})
+				.onNegative(new MaterialDialog.SingleButtonCallback(){
+
+					@Override
+					public void onClick(MaterialDialog p1, DialogAction p2)
+					{
+						p1.dismiss();
+					}
+				})
+				.build();
+			if (new_version_code > getVersionCode())
+			{
+				isUpdate = true;
+				update_log_dialog.setTitle(R.string.found_new_version);
+				update_log_dialog.show();
+			}else if (startSerSharePre.getBoolean(SettingUtil.DEV_UPDATE_KEY, false))
+			{
+				if (Integer.parseInt(new_version_name) > Integer.parseInt(getVersionName()))
+				{
+					isBetaUpdate = true;
+					update_log_dialog.setTitle(R.string.found_new_beta_version);
+					update_log_dialog.show();
+				}else
+				{
+					Toast.makeText(context, R.string.aleady_latest_version, Toast.LENGTH_LONG).show();
+				}
+				check_version_dialog.dismiss();
+			}
+			
+            super.onPostExecute(result);
+        }
+    }
+
+	public static int getVersionCode()
+	{
+        PackageManager packageManager = context.getPackageManager();
+        try
+		{
+            PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+            int versionCode = packageInfo.versionCode;
+            return versionCode;
+        }
+		catch (PackageManager.NameNotFoundException e)
+		{
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+	public static String getVersionName()
+	{
+        PackageManager packageManager = context.getPackageManager();
+        try
+		{
+            PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+            String versionName = packageInfo.versionName;
+            return versionName;
+        }
+		catch (PackageManager.NameNotFoundException e)
+		{
+            e.printStackTrace();
+        }
+
+        return "0";
+    }
 }
 
 

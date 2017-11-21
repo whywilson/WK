@@ -54,6 +54,7 @@ import cc.yuyeye.wk.Util.*;
 
 public class MainActivity extends AppCompatActivity
 {
+	public static Context mContext;
     public static SharedPreferences sharedPreferences;
     public static String sendPerson = "所有人";
     private SectionsPagerAdapter mSectionsPagerAdapter;
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_tab);
 
+		mContext = this;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -100,16 +102,9 @@ public class MainActivity extends AppCompatActivity
 
 		if (InternetUtil.getNetworkState(this.getBaseContext()) != 0)
 		{
-            new Thread(Common.runWk_version).start();
-            if (Common.isUpdate)
-			{
-                ToastUtil.showSimpleToast("Update");
-            }
-            if (!phoneAlias.equals(""))
-			{
-                new Thread(runWk_login).start();
-            }
-
+			new Common.url().execute();
+			
+            
         } 
 	}
 
@@ -118,7 +113,7 @@ public class MainActivity extends AppCompatActivity
 	{
         if (InternetUtil.getNetworkState(this) != 0)
 		{
-            new Thread(runWk_login).start();
+			new Common.login().execute();
         }
 
 		if (IMEI == "0")
@@ -278,39 +273,6 @@ public class MainActivity extends AppCompatActivity
             im.hideSoftInputFromWindow(token, InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
-
-    public Runnable runWk_login = new Runnable() {
-        public void run()
-		{
-            //获取当前时间
-            SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.PRC);
-            String currentTime = sDateFormat.format(new java.util.Date());
-            String nettype = InternetUtil.getNetworkState(Common.getContext()) + "";
-            String localIp = InternetUtil.getLocalIp(Common.getContext()) + "";
-            String netIp = InternetUtil.getNetIp() + "";
-
-            ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
-
-            nameValuePairs.add(new BasicNameValuePair("imei", IMEI));
-            nameValuePairs.add(new BasicNameValuePair("alias", phoneAlias));
-            nameValuePairs.add(new BasicNameValuePair("time", currentTime));
-            nameValuePairs.add(new BasicNameValuePair("version", Integer.toString(Common.localVersion)));
-            nameValuePairs.add(new BasicNameValuePair("vname", Common.localVersionName));
-            nameValuePairs.add(new BasicNameValuePair("nettype", nettype));
-            nameValuePairs.add(new BasicNameValuePair("ip", netIp));
-            try
-			{
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost(wkRunnable.wk_loginUrl);
-                httppost.setEntity(new UrlEncodedFormEntity((nameValuePairs), "UTF_8"));
-                httpclient.execute(httppost);
-            }
-			catch (Exception e)
-			{
-                LogUtil.e("wkrunnable", "Login错误 " + e.toString());
-            }
-        }
-    };
 
     private void initImageLoader()
 	{

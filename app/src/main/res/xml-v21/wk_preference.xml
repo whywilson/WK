@@ -28,13 +28,6 @@
             android:key="image_source"
             
             android:title="@string/ImageSourceSetting" />
-        <ListPreference
-            android:dialogTitle="@string/appSourceSetting"
-            android:entries="@array/updateSourceArray"
-            android:entryValues="@array/updateSourceArrayValues"
-            android:key="update_source"
-            
-            android:title="@string/appSourceSetting" />
         <SwitchPreference
             android:defaultValue="true"
             android:key="show_nettype_key"

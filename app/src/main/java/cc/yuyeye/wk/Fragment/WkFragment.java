@@ -117,7 +117,7 @@ public class WkFragment extends Fragment
 					{
 						if (Common.isUpdate || Common.isBetaUpdate)
 						{
-							updateDialog();
+							new Common.version(getActivity()).execute();
 						}
 						else
 						{
@@ -172,7 +172,8 @@ public class WkFragment extends Fragment
 				@Override
 				public boolean onLongClick(View p1)
 				{
-					screenShotToWallpaper(false);
+					new Common.url().execute();
+				//	screenShotToWallpaper(false);
 					return true;
 				}
 			});
@@ -324,50 +325,7 @@ public class WkFragment extends Fragment
         };
         run_SetWallpaper.run();
 		// MainActivity.this.finish();
-    }
-
-    public void updateDialog()
-	{
-
-        // 发现新版本，提示用户更新
-        AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-        alert.setTitle(R.string.updateTips);
-
-        alert.setCancelable(false);
-        if (Common.isUpdate)
-		{
-            alert.setMessage(getString(R.string.findNewVersion) + Common.updateLog);
-
-            alert.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which)
-					{
-						Intent updateIntent = new Intent(getActivity(), UpdateService.class);
-						updateIntent.putExtra("app_name", getResources().getString(R.string.app_name));
-						getActivity().startService(updateIntent);
-					}
-				});
-        }
-		else if (Common.isBetaUpdate)
-		{
-            alert.setMessage(getString(R.string.find) + Common.serverVersionName + getString(R.string.betaVersion) + Common.updateLog);
-            alert.setPositiveButton(R.string.betaUpdate, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which)
-					{
-						Intent updateIntent = new Intent(getActivity(), UpdateService.class);
-						updateIntent.putExtra("app_name", getResources().getString(R.string.app_name));
-						getActivity().startService(updateIntent);
-					}
-				});
-        }
-
-        alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which)
-				{
-					dialog.dismiss();
-				}
-			});
-        alert.create().show();
-    }
+    } 
 
     public class jokeTask extends AsyncTask<Integer, Integer, String>
 	{

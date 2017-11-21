@@ -1,31 +1,28 @@
 package cc.yuyeye.wk.Activity;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.util.Log;
+import android.app.*;
+import android.content.*;
+import android.content.SharedPreferences.*;
+import android.net.*;
+import android.os.*;
+import android.preference.*;
+import android.support.annotation.*;
+import android.util.*;
+import android.widget.*;
+import cc.yuyeye.wk.*;
+import cc.yuyeye.wk.Service.*;
+import cc.yuyeye.wk.Util.*;
+import cn.jpush.android.api.*;
+import com.afollestad.materialdialogs.*;
+import java.util.*;
 
-import java.util.Set;
-
-import cc.yuyeye.wk.Common;
 import cc.yuyeye.wk.R;
-import cc.yuyeye.wk.Service.UpdateService;
-import cc.yuyeye.wk.Util.SettingUtil;
-import cn.jpush.android.api.JPushInterface;
-import cn.jpush.android.api.TagAliasCallback;
+import android.widget.MultiAutoCompleteTextView.*;
 
 public class SettingActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 
     private EditTextPreference mEtPreference_ID;
     private EditTextPreference mEtPreference_QQ;
-    private ListPreference mListPreference_UpdateSource;
     private Preference mAboutPreference;
 
     @Override
@@ -38,7 +35,6 @@ public class SettingActivity extends PreferenceActivity implements OnSharedPrefe
     private void initPreferences() {
         mEtPreference_ID = (EditTextPreference) findPreference(SettingUtil.ID_KEY);
         mEtPreference_QQ = (EditTextPreference) findPreference(SettingUtil.QQ_KEY);
-        mListPreference_UpdateSource = (ListPreference) findPreference(SettingUtil.UPDATE_SOURCE);
         mAboutPreference = findPreference(SettingUtil.ABOUT_KEY);
     }
 
@@ -50,7 +46,6 @@ public class SettingActivity extends PreferenceActivity implements OnSharedPrefe
         final SharedPreferences sharedPreferences = getPreferenceScreen().getSharedPreferences();
         mEtPreference_ID.setSummary(sharedPreferences.getString(SettingUtil.ID_KEY, "Anonymous"));
         mEtPreference_QQ.setSummary(sharedPreferences.getString(SettingUtil.QQ_KEY, ""));
-        mListPreference_UpdateSource.setSummary(mListPreference_UpdateSource.getEntry());
         if (mEtPreference_QQ.getSummary().equals("")) {
             mEtPreference_ID.setEnabled(true);
         }
@@ -60,27 +55,40 @@ public class SettingActivity extends PreferenceActivity implements OnSharedPrefe
         mAboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(SettingActivity.this);
-                builder.setTitle(getResources().getString(R.string.about)+" "+ Common.localVersion +" "+Common.localVersionName);
-                builder.setMessage(getString(R.string.about_app) + "\n" + Common.updateLog);
-                builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+				MaterialDialog.Builder about_dialog = new MaterialDialog.Builder(SettingActivity.this)
+					.title(R.string.about)
+					.content(R.string.about_app)
+					.autoDismiss(false)
+					.positiveText(R.string.official_website)
+					.onPositive(new MaterialDialog.SingleButtonCallback() {
+						@Override
+						public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+							String url =Common.url_domain;
+							Uri webpage = Uri.parse(url);
 
-                    @Override
-                    public void onClick(DialogInterface p1, int p2) {
-                    }
-                });
-                builder.setNeutralButton(R.string.downloadAgain, new DialogInterface.OnClickListener() {
+							if (!url.startsWith("http://") && !url.startsWith("https://")) {
+								webpage = Uri.parse("http://" + url);
+							}
 
-                    @Override
-                    public void onClick(DialogInterface p1, int p2) {
-                        if (sharedPreferences.getBoolean(SettingUtil.DEV_UPDATE_KEY, false)) {
-                            Intent updateIntent = new Intent(SettingActivity.this, UpdateService.class);
-                            updateIntent.putExtra("app_name", getResources().getString(R.string.app_name));
-                            startService(updateIntent);
-                        }
-                    }
-                });
-                builder.show();
+							Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+							if (intent.resolveActivity(MainActivity.mContext.getPackageManager()) != null) {
+								MainActivity.mContext.startActivity(intent);
+							}
+							dialog.dismiss();
+						}
+					})
+					.neutralText(R.string.check_update)
+					.onNeutral(new MaterialDialog.SingleButtonCallback() {
+
+						@Override
+						public void onClick(MaterialDialog p1, DialogAction p2) {
+							new Common.version(SettingActivity.this).execute();
+							//	p1.dismiss();
+						}
+					});
+
+                about_dialog.show();
+				
                 return true;
             }
         });
@@ -115,9 +123,6 @@ public class SettingActivity extends PreferenceActivity implements OnSharedPrefe
                     }
                 });
                 JPushInterface.resumePush(Common.getContext());
-                break;
-            case SettingUtil.UPDATE_SOURCE:
-                mListPreference_UpdateSource.setSummary(mListPreference_UpdateSource.getEntry());
                 break;
         }
     }

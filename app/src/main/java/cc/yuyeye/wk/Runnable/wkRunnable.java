@@ -28,12 +28,12 @@ import cc.yuyeye.wk.Fragment.*;
 import cc.yuyeye.wk.Util.*;
 
 public class wkRunnable {
-    public static String wk_notifyUrl = "http://api.yuyeye.cc/wk_notify.php";
-    public static String wk_messageUrl = "http://api.yuyeye.cc/wk_message.php";
-    public static String wk_loginUrl = "http://api.yuyeye.cc/wk_login.php";
-    public static String wk_reportUrl = "http://api.yuyeye.cc/wk_report.php";
-    public static String wk_timeUrl = "http://api.yuyeye.cc/wk_time.php";
-    public static String wk_msgAddUrl = "http://api.yuyeye.cc/wk_msgAdd.php";
+    public static String wk_notifyUrl = Common.url_domain + "wk_notify.php";
+    public static String wk_messageUrl = Common.url_domain + "wk_message.php";
+    public static String wk_loginUrl = Common.url_domain + "wk_login.php";
+    public static String wk_reportUrl = Common.url_domain + "wk_report.php";
+    public static String wk_timeUrl = Common.url_domain + "wk_time.php";
+    public static String wk_msgAddUrl = Common.url_domain + "wk_msgAdd.php";
 	public static String report = "";
     private static String currentTime;
 
@@ -113,37 +113,4 @@ public class wkRunnable {
             }
         }
     };
-
-    public static Runnable runWk_login = new Runnable() {
-        public void run() {
-            //获取当前时间
-            SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.PRC);
-            String currentTime = sDateFormat.format(new java.util.Date());
-            String nettype = InternetUtil.getNetworkState(Common.getContext()) + "";
-            String localIp = InternetUtil.getLocalIp(Common.getContext()) + "";
-            String netIp = InternetUtil.getNetIp() + "";
-
-            ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
-
-            nameValuePairs.add(new BasicNameValuePair("imei", IMEI));
-            nameValuePairs.add(new BasicNameValuePair("alias", phoneAlias));
-            nameValuePairs.add(new BasicNameValuePair("time", currentTime));
-            nameValuePairs.add(new BasicNameValuePair("version", Integer.toString(Common.localVersion)));
-            nameValuePairs.add(new BasicNameValuePair("vname", Common.localVersionName));
-            nameValuePairs.add(new BasicNameValuePair("nettype", nettype));
-            nameValuePairs.add(new BasicNameValuePair("ip", netIp));
-            try {
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost(wk_loginUrl);
-                httppost.setEntity(new UrlEncodedFormEntity((nameValuePairs), UTF_8));
-                httpclient.execute(httppost);
-                
-				LogUtil.i("wkrunnable","login \n" + IMEI +" " + phoneAlias + " " + currentTime + " " + Common.localVersion + " " + Common.localVersionName + " " + currentTime + " " + nettype + " " + netIp);
-            } catch (Exception e) {
-                LogUtil.e("wkrunnable", "Login错误 " + e.toString());
-            }
-        }
-    };
-
-
 }
