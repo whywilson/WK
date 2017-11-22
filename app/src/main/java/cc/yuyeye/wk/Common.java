@@ -3,19 +3,20 @@ package cc.yuyeye.wk;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;
-import android.content.pm.PackageManager.*;
+import android.net.*;
 import android.os.*;
 import android.preference.*;
+import android.support.v4.content.*;
 import android.util.*;
 import android.view.*;
 import android.widget.*;
-import cc.yuyeye.wk.Service.*;
+import cc.yuyeye.wk.*;
 import cc.yuyeye.wk.Util.*;
 import cn.jpush.android.api.*;
 import com.afollestad.materialdialogs.*;
 import java.io.*;
+import java.net.*;
 import java.util.*;
-import java.util.regex.*;
 import org.apache.http.*;
 import org.apache.http.client.*;
 import org.apache.http.client.entity.*;
@@ -24,6 +25,8 @@ import org.apache.http.impl.client.*;
 import org.apache.http.message.*;
 import org.json.*;
 
+import cc.yuyeye.wk.R;
+
 
 public class Common extends Application
 {
@@ -31,14 +34,13 @@ public class Common extends Application
 	public static String url_domain;
 	public static String url_login;
 	public static String url_version;
-	public static String new_version_apk;
+	public static String url_apk;
 	public static int new_version_code;
 	public static String new_version_name;
 	public static String new_version_log;
     public static Boolean isUpdate = false;
     public static Boolean isBetaUpdate = false;
     public static String TAG = "WkApplication";
-    public static String downloadDir = "Download/";
     public static Context context;
     public static BasicPushNotificationBuilder soundBuilder;
     public static String phoneAlias;
@@ -58,7 +60,7 @@ public class Common extends Application
 	{
         super.onCreate();
         context = getApplicationContext();
-        
+
         context = getApplicationContext();
         startSerSharePre = PreferenceManager.getDefaultSharedPreferences(this);
         startJPush();
@@ -162,7 +164,7 @@ public class Common extends Application
             }
 			catch (Exception e)
 			{
-                Log.e(TAG, "httpClient" + e.toString());
+                Log.e(TAG, "url httpClient" + e.toString());
             }
 
             try
@@ -180,7 +182,7 @@ public class Common extends Application
             }
 			catch (Exception e)
 			{
-                Log.e(TAG, "reader" + e.toString());
+                Log.e(TAG, "url reader" + e.toString());
             }
 
             try
@@ -195,7 +197,7 @@ public class Common extends Application
             }
 			catch (JSONException e)
 			{
-                Log.e(TAG, "transfer " + e.toString());
+                Log.e(TAG, "url transfer " + e.toString());
             }
 
             return null;
@@ -204,13 +206,13 @@ public class Common extends Application
         @Override
         protected void onPostExecute(String result)
 		{
-			if(new_version_code > getVersionCode()
-			   |(Integer.parseInt(new_version_name) > Integer.parseInt(getVersionName()) 
-			 	  &&startSerSharePre.getBoolean(SettingUtil.DEV_UPDATE_KEY, false)))
+			if (new_version_code > getVersionCode()
+				| (Integer.parseInt(new_version_name) > Integer.parseInt(getVersionName()) 
+				&& startSerSharePre.getBoolean(SettingUtil.DEV_UPDATE_KEY, false)))
 			{
 				new version(MainActivity.mContext).execute();
 			}
-            
+
             new login().execute();
 
             super.onPostExecute(result);
@@ -261,7 +263,7 @@ public class Common extends Application
             }
 			catch (Exception e)
 			{
-                Log.e(TAG, "httpClient" + e.toString());
+                Log.e(TAG, "login httpClient" + e.toString());
             }
 
             try
@@ -279,7 +281,7 @@ public class Common extends Application
             }
 			catch (Exception e)
 			{
-                Log.e(TAG, "reader" + e.toString());
+                Log.e(TAG, "login reader" + e.toString());
             }
 
             try
@@ -292,7 +294,7 @@ public class Common extends Application
             }
 			catch (JSONException e)
 			{
-                Log.e(TAG, "transfer " + e.toString());
+                Log.e(TAG, "login transfer " + e.toString());
             }
 
             return null;
@@ -351,7 +353,7 @@ public class Common extends Application
             }
 			catch (Exception e)
 			{
-                Log.e(TAG, "httpClient" + e.toString());
+                Log.e(TAG, "version httpClient" + e.toString());
             }
 
             try
@@ -369,7 +371,7 @@ public class Common extends Application
             }
 			catch (Exception e)
 			{
-                Log.e(TAG, "reader" + e.toString());
+                Log.e(TAG, "version reader" + e.toString());
             }
 
             try
@@ -380,11 +382,11 @@ public class Common extends Application
                 new_version_code = jsonObj.getInt("version");
 				new_version_name = jsonObj.getString("vname");
 				new_version_log = jsonObj.getString("log");
-				new_version_apk = jsonObj.getString("apk");
+				url_apk = jsonObj.getString("apk");
             }
 			catch (JSONException e)
 			{
-                Log.e(TAG, "transfer " + e.toString());
+                Log.e(TAG, "version transfer " + e.toString());
             }
 
             return null;
@@ -405,9 +407,7 @@ public class Common extends Application
 					@Override
 					public void onClick(MaterialDialog p1, DialogAction p2)
 					{
-						Intent updateIntent = new Intent(MainActivity.mContext, UpdateService.class);
-						updateIntent.putExtra("app_name", context.getResources().getString(R.string.app_name));
-						MainActivity.mContext.startService(updateIntent);
+						new update(context).execute();
 					}
 				})
 				.onNegative(new MaterialDialog.SingleButtonCallback(){
@@ -424,22 +424,172 @@ public class Common extends Application
 				isUpdate = true;
 				update_log_dialog.setTitle(R.string.found_new_version);
 				update_log_dialog.show();
-			}else if (startSerSharePre.getBoolean(SettingUtil.DEV_UPDATE_KEY, false))
+			}
+			else if (startSerSharePre.getBoolean(SettingUtil.DEV_UPDATE_KEY, false))
 			{
 				if (Integer.parseInt(new_version_name) > Integer.parseInt(getVersionName()))
 				{
 					isBetaUpdate = true;
 					update_log_dialog.setTitle(R.string.found_new_beta_version);
 					update_log_dialog.show();
-				}else
-				{
-					Toast.makeText(context, R.string.aleady_latest_version, Toast.LENGTH_LONG).show();
+
 				}
-				check_version_dialog.dismiss();
 			}
-			
+			else
+			{
+				Toast.makeText(context, R.string.aleady_latest_version, Toast.LENGTH_LONG).show();
+			}
+			check_version_dialog.dismiss();
             super.onPostExecute(result);
         }
+    }
+
+	public static class update extends AsyncTask<Integer, Integer, Integer>
+	{
+		public Context context;
+		public MaterialDialog download_pkg_dialog;
+        public ArrayList<NameValuePair> nameValuePairs;
+
+		public static final int TIMEOUT = 10 * 1000;// 超时
+		public static String down_url = Common.url_apk;
+		public static final int DOWN_OK = 1;
+		public static final int DOWN_ERROR = 0;
+		public static int down_status;
+		public Intent updateIntent;
+		public PendingIntent pendingIntent;
+
+		public update(Context context)
+		{
+			super();
+			this.context = context;
+		}
+
+        @Override
+        protected void onPreExecute()
+		{
+			download_pkg_dialog = new MaterialDialog.Builder(context)
+				.title(R.string.downloading)
+				.progress(false, 100, true)
+				.content(R.string.keep_online)
+				.cancelable(false)
+				.negativeText(R.string.cancel)
+				.onNegative(new MaterialDialog.SingleButtonCallback(){
+
+					@Override
+					public void onClick(MaterialDialog p1, DialogAction p2)
+					{
+						p1.dismiss();
+					}
+				})
+				.build();
+            download_pkg_dialog.show();
+			FileUtil.createFile("WK_" + new_version_name);
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Integer doInBackground(Integer[] params)
+		{
+			try
+			{
+				//down_status = (int)downloadUpdateFile(down_url, FileUtil.updateFile.toString());
+
+				int down_step = 1;// 提示step
+				int totalSize;// 文件总大小
+				int downloadCount = 0;// 已经下载好的大小
+				int updateCount = 0;// 已经上传的文件大小
+				InputStream inputStream;
+				OutputStream outputStream;
+
+				URL url = new URL(url_apk);
+				HttpURLConnection httpURLConnection = (HttpURLConnection) url
+					.openConnection();
+				httpURLConnection.setConnectTimeout(TIMEOUT);
+				httpURLConnection.setReadTimeout(TIMEOUT);
+				// 获取下载文件的size
+				totalSize = httpURLConnection.getContentLength();
+				if (httpURLConnection.getResponseCode() == 404)
+				{
+					throw new Exception("fail!");
+				}
+				inputStream = httpURLConnection.getInputStream();
+				outputStream = new FileOutputStream(FileUtil.updateFile.toString(), false);// 文件存在则覆盖掉
+				byte buffer[] = new byte[1024];
+				int readsize = 0;
+				while ((readsize = inputStream.read(buffer)) != -1)
+				{
+					outputStream.write(buffer, 0, readsize);
+					downloadCount += readsize;// 时时获取下载到的大小
+
+					if (updateCount == 0
+						|| (downloadCount * 100 / totalSize - down_step) >= updateCount)
+					{
+						updateCount += down_step;
+						download_pkg_dialog.incrementProgress(down_step);
+					}
+
+				}
+				if (httpURLConnection != null)
+				{
+					httpURLConnection.disconnect();
+				}
+				inputStream.close();
+				outputStream.close();
+
+				down_status = downloadCount;
+			}
+			catch (Exception e)
+			{
+				Log.e(TAG, "update download " + e.toString());
+				e.printStackTrace();
+			}
+
+            return down_status;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result)
+		{
+			if (down_status > 0)
+			{
+				installApk(FileUtil.updateFile);
+//				Uri uri = Uri.fromFile(FileUtil.updateFile);
+//				Intent intent = new Intent(Intent.ACTION_VIEW);
+//				intent.setDataAndType(uri,"application/vnd.android.package-archive");
+//				context.startActivity(intent);
+			}
+			else
+			{
+				ToastUtil.showToast("下载失败");
+			}
+			download_pkg_dialog.dismiss();
+            super.onPostExecute(result);
+        }
+
+		protected void installApk(File file)
+		{
+			try
+			{
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+				{ // 7.0+以上版本
+					Uri apkUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);  //包名.fileprovider
+					intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+				}
+				else
+				{
+					intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+				}
+				context.startActivity(intent);
+			}
+			catch (Exception e)
+			{
+				Log.e(TAG, "install apk " + e.toString());
+			}
+
+		}
     }
 
 	public static int getVersionCode()
@@ -474,6 +624,7 @@ public class Common extends Application
 
         return "0";
     }
+
 }
 
 

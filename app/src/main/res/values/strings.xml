@@ -207,6 +207,7 @@
 	<string name="found_new_beta_version">发现新Beta版本</string>
 	<string name="official_website">官网</string>
 	<string name="checking">检测升级中</string>
+	<string name="downloading">下载中</string>
 	<string name="check_update">检查更新</string>
 	<string name="keep_online">请保持网络连接</string>
 	<string name="aleady_latest_version">已经是最新版本</string>

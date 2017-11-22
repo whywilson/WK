@@ -1,6 +1,5 @@
 package cc.yuyeye.wk.Activity;
 
-import android.app.*;
 import android.content.*;
 import android.content.SharedPreferences.*;
 import android.net.*;
@@ -8,16 +7,13 @@ import android.os.*;
 import android.preference.*;
 import android.support.annotation.*;
 import android.util.*;
-import android.widget.*;
 import cc.yuyeye.wk.*;
-import cc.yuyeye.wk.Service.*;
 import cc.yuyeye.wk.Util.*;
 import cn.jpush.android.api.*;
 import com.afollestad.materialdialogs.*;
 import java.util.*;
 
 import cc.yuyeye.wk.R;
-import android.widget.MultiAutoCompleteTextView.*;
 
 public class SettingActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 
