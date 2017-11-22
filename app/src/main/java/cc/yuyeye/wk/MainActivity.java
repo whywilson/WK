@@ -1,56 +1,34 @@
 package cc.yuyeye.wk;
 
+import android.*;
+import android.content.*;
+import android.content.pm.*;
+import android.os.*;
+import android.preference.*;
+import android.support.design.widget.*;
+import android.support.v4.app.*;
+import android.support.v4.view.*;
+import android.support.v7.app.*;
+import android.telephony.*;
+import android.view.*;
+import android.view.inputmethod.*;
+import android.widget.*;
+import cc.yuyeye.wk.*;
+import cc.yuyeye.wk.Activity.*;
+import cc.yuyeye.wk.DB.*;
+import cc.yuyeye.wk.Fragment.*;
+import cc.yuyeye.wk.Util.*;
+import com.android.volley.*;
+import com.android.volley.toolbox.*;
+import java.text.*;
+import java.util.*;
+
 import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.preference.PreferenceManager;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.Volley;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-
-import cc.yuyeye.wk.Activity.LoginActivity;
-import cc.yuyeye.wk.DB.ChatDb;
-import cc.yuyeye.wk.Fragment.BingFragment;
-import cc.yuyeye.wk.Fragment.ChatFragment;
-import cc.yuyeye.wk.Fragment.WkFragment;
-import cc.yuyeye.wk.Runnable.wkRunnable;
-import cc.yuyeye.wk.Util.BitmapCache;
-import cc.yuyeye.wk.Util.InternetUtil;
-import cc.yuyeye.wk.Util.LogUtil;
-import cc.yuyeye.wk.Util.SettingUtil;
+import cc.yuyeye.wk.R;
 
 import static cc.yuyeye.wk.Fragment.ChatFragment.mChatHeaderImage;
 import static cc.yuyeye.wk.Fragment.ChatFragment.mChatMsgView;
 import static cc.yuyeye.wk.Fragment.ChatFragment.mChatTitleTime;
-import android.support.v4.app.*;
-import cc.yuyeye.wk.Util.*;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -71,6 +49,8 @@ public class MainActivity extends AppCompatActivity
 
     private TabLayout tabLayout;
 
+	private int REQUEST_CODE_ASK_PHONE_STATE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
 	{
@@ -78,6 +58,12 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main_tab);
 
 		mContext = this;
+		
+		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE_ASK_PHONE_STATE);
+            return;
+        }
+		
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -103,8 +89,6 @@ public class MainActivity extends AppCompatActivity
 		if (InternetUtil.getNetworkState(this.getBaseContext()) != 0)
 		{
 			new Common.url().execute();
-			
-            
         } 
 	}
 
@@ -116,40 +100,25 @@ public class MainActivity extends AppCompatActivity
 			new Common.login().execute();
         }
 
-		if (IMEI == "0")
-		{
-			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
-		}
         isForeground = true;
-        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-				@Override
-				public void onPageScrolled(int p1, float p2, int p3)
-				{
-
-				}
-
-				@Override
-				public void onPageSelected(int p1)
-				{
-//					if(p1 != 1){
-//						tabLayout.setVisibility(View.VISIBLE);
-//					}
-				}
-
-				@Override
-				public void onPageScrollStateChanged(int p1)
-				{
-//					if(p1 == 1){
-//						tabLayout.setVisibility(View.VISIBLE);
-//					}else{
-//						tabLayout.setVisibility(View.INVISIBLE);
-//					}
-				}
-			});
         super.onResume();
     }
 
+	@Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, R.string.allow_phone_status_permission, Toast.LENGTH_LONG).show();
+                }
+                finish();
+                startActivity(getIntent());
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+    }
 
     @Override
     protected void onPause()
