@@ -8,8 +8,8 @@ android {
         applicationId "cc.yuyeye.wk"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 22
-        versionName '20171120'
+        versionCode 23
+        versionName '20171123'
         vectorDrawables.useSupportLibrary = true
     }
     lintOptions {
