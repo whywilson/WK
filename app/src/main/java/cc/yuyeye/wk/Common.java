@@ -61,7 +61,6 @@ public class Common extends Application
         super.onCreate();
         context = getApplicationContext();
 
-        context = getApplicationContext();
         startSerSharePre = PreferenceManager.getDefaultSharedPreferences(this);
         startJPush();
     }
@@ -206,7 +205,7 @@ public class Common extends Application
         @Override
         protected void onPostExecute(String result)
 		{
-			if (new_version_code > getVersionCode()
+			if ((new_version_code > getVersionCode())
 				| (Integer.parseInt(new_version_name) > Integer.parseInt(getVersionName()) 
 				&& startSerSharePre.getBoolean(SettingUtil.DEV_UPDATE_KEY, false)))
 			{
