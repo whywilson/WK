@@ -33,7 +33,6 @@ import static cc.yuyeye.wk.Fragment.ChatFragment.mChatTitleTime;
 public class MainActivity extends AppCompatActivity
 {
 	public static Context mContext;
-    public static SharedPreferences sharedPreferences;
     public static String sendPerson = "所有人";
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
@@ -64,7 +63,6 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 		
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -186,7 +184,7 @@ public class MainActivity extends AppCompatActivity
 
     public void checkPhoneAlias()
 	{
-        phoneAlias = sharedPreferences.getString(SettingUtil.ID_KEY, "");
+        phoneAlias = Common.getSharedPreference().getString(SettingUtil.ID_KEY, "");
         if (phoneAlias.equals(""))
 		{
             Intent intent = new Intent(this, LoginActivity.class);
@@ -196,7 +194,7 @@ public class MainActivity extends AppCompatActivity
 
     public static void checkSendPerson()
 	{
-        sendPerson = sharedPreferences.getString("sendPerson", Common.getContext().getResources().getString(R.string.allContacts));
+        sendPerson = Common.getSharedPreference().getString("sendPerson", Common.getContext().getResources().getString(R.string.allContacts));
     }
 
     @Override

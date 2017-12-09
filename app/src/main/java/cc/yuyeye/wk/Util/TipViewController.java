@@ -27,7 +27,8 @@ import cc.yuyeye.wk.Fragment.ChatFragment;
 
 import cc.yuyeye.wk.MainActivity;
 import cc.yuyeye.wk.R;
-import cc.yuyeye.wk.Runnable.wkRunnable;
+import cc.yuyeye.wk.Runnable.wkTask;
+import cc.yuyeye.wk.*;
 
 public class TipViewController implements View.OnClickListener, View.OnTouchListener, ViewContainer.KeyEventHandler {
 
@@ -61,9 +62,10 @@ public class TipViewController implements View.OnClickListener, View.OnTouchList
 
     public void replyMsg() {
         ChatFragment.msgDetail = mReplyContent.getText().toString();
-        new Thread(wkRunnable.runWk_message).start();
+		new wkTask.wk_message(Common.context, mSharePre.getString("sendPerson", "W.K."), Common.phoneAlias, mReplyContent.getText().toString(), "");
+      //  new Thread(wkRunnable.runWk_message).start();
         if (mSharePre.getBoolean(SettingUtil.SAVE_MSG_KEY, false)) {
-            new Thread(wkRunnable.runWk_msgAdd).start();
+			new wkTask.msg_upload(Common.context, MainActivity.phoneAlias, mSharePre.getString("sendPerson", "W.K."), mReplyContent.getText().toString()).execute();
             MainActivity.SaveChatRecord(MainActivity.phoneAlias, MainActivity.phoneAlias, MainActivity.sendPerson, ChatFragment.msgDetail);
         }
         MediaPlayer sendSound = MediaPlayer.create(mContext, R.raw.msg_send);

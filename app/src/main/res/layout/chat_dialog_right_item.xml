@@ -5,7 +5,7 @@
 	android:layout_width="match_parent"
 	android:paddingBottom="4dp"
 	android:gravity="right"
-    android:clickable="true"
+	android:clickable="true"
 	android:id="@+id/wk_chat_layout">
 
 	<LinearLayout
@@ -30,25 +30,41 @@
 				android:text="@string/Turing"
 				android:focusable="false"/>
 
-			<TextView
-                android:text="@string/test_msg"
-				android:clickable="true"
-				android:id="@+id/wk_chat_message"
-				android:layout_width="wrap_content"
+			<LinearLayout
 				android:layout_height="wrap_content"
-				android:textSize="16sp"
-				android:textColor="#FFFFFF"
-				android:gravity="left|center_vertical"
-				android:lineSpacingExtra="2dp"
-				android:autoLink="email|web"
-				android:maxWidth="200dp"
-				android:layout_marginTop="2dp"
-				android:background="@drawable/rounded_right_dialog"
-				android:paddingLeft="8dp"
-				android:paddingRight="14dp"
-				android:paddingTop="8dp"
-				android:paddingBottom="8dp"
-				android:textColorLink="#FFFF87"/>
+				android:layout_width="wrap_content"
+				android:orientation="vertical">
+
+				<TextView
+					android:text="@string/test_msg"
+					android:clickable="true"
+					android:id="@+id/wk_chat_message"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textSize="16sp"
+					android:textColor="#FFFFFF"
+					android:gravity="left|center_vertical"
+					android:lineSpacingExtra="2dp"
+					android:autoLink="email|web"
+					android:maxWidth="200dp"
+					android:background="@drawable/rounded_right_dialog"
+					android:paddingLeft="8dp"
+					android:paddingRight="14dp"
+					android:paddingTop="8dp"
+					android:paddingBottom="8dp"
+					android:textColorLink="#FFFF87"/>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textAppearance="?android:attr/textAppearanceSmall"
+					android:text="Read"
+					android:layout_margin="1dp"
+					android:id="@+id/wk_chat_msg_read"
+					android:visibility="visible"
+					android:textSize="10sp"/>
+
+			</LinearLayout>
 
 		</LinearLayout>
 

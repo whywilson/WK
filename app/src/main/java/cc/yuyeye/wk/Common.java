@@ -44,10 +44,15 @@ public class Common extends Application
     public static Context context;
     public static BasicPushNotificationBuilder soundBuilder;
     public static String phoneAlias;
-    public static SharedPreferences startSerSharePre;
+    public static SharedPreferences sharedPreferences;
 
     private CustomPushNotificationBuilder vibrateBuilder;
     private WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams();
+
+	public static SharedPreferences getSharedPreference()
+	{
+		return sharedPreferences;
+	}
 
     public WindowManager.LayoutParams getWkwmParams()
 	{
@@ -61,7 +66,7 @@ public class Common extends Application
         super.onCreate();
         context = getApplicationContext();
 
-        startSerSharePre = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         startJPush();
     }
 
@@ -72,7 +77,7 @@ public class Common extends Application
 
     public void startJPush()
 	{
-        phoneAlias = startSerSharePre.getString(SettingUtil.ID_KEY, "");
+        phoneAlias = sharedPreferences.getString(SettingUtil.ID_KEY, "");
         if (phoneAlias != "")
 		{
             JPushInterface.init(this);
@@ -88,7 +93,7 @@ public class Common extends Application
             soundBuilder.notificationDefaults = Notification.DEFAULT_LIGHTS;
             JPushInterface.setPushNotificationBuilder(1, soundBuilder);
             JPushInterface.setDebugMode(false);
-            JPushInterface.setLatestNotificationNumber(this, 3);
+            JPushInterface.setLatestNotificationNumber(this, 5);
 
             JPushInterface.setAlias(this, phoneAlias, new TagAliasCallback() {
 					@Override
@@ -207,7 +212,7 @@ public class Common extends Application
 		{
 			if ((new_version_code > getVersionCode())
 				| (Integer.parseInt(new_version_name) > Integer.parseInt(getVersionName()) 
-				&& startSerSharePre.getBoolean(SettingUtil.DEV_UPDATE_KEY, false)))
+				&& sharedPreferences.getBoolean(SettingUtil.DEV_UPDATE_KEY, false)))
 			{
 				new version(MainActivity.mContext).execute();
 			}
@@ -424,7 +429,7 @@ public class Common extends Application
 				update_log_dialog.setTitle(R.string.found_new_version);
 				update_log_dialog.show();
 			}
-			else if (startSerSharePre.getBoolean(SettingUtil.DEV_UPDATE_KEY, false))
+			else if (sharedPreferences.getBoolean(SettingUtil.DEV_UPDATE_KEY, false))
 			{
 				if (Integer.parseInt(new_version_name) > Integer.parseInt(getVersionName()))
 				{

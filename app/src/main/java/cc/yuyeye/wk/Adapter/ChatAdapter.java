@@ -43,6 +43,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     private List<chatListBean> items;
     private Context context;
     private boolean isActionMode = false;
+	private boolean isRead = false;
     private LayoutInflater mInflater;
     private RequestQueue requestQueue = Volley.newRequestQueue(Common.getContext());
     private ImageLoader loader = new ImageLoader(requestQueue, new BitmapCache());
@@ -61,6 +62,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 //        selectAllItem(false);
     }
 
+	public void setIsRead(boolean isRead)
+	{
+		this.isRead = isRead;
+	}
+
+	public boolean isRead()
+	{
+		return isRead;
+	}
+
     @Override
     public ChatAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v;
@@ -77,6 +88,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         public TextView wk_chat_message;
         public TextView wk_chat_name;
         public TextView wk_chat_time;
+		public TextView wk_chat_msg_read;
         public NetworkImageView wk_chat_image;
         public AppCompatCheckBox wk_chat_checkbox;
         public RelativeLayout wk_chat_layout;
@@ -91,9 +103,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             wk_chat_message = (TextView) v.findViewById(R.id.wk_chat_message);
             wk_chat_name = (TextView) v.findViewById(R.id.wk_chat_name);
             wk_chat_time = (TextView) v.findViewById(R.id.wk_chat_time);
+			wk_chat_msg_read = (TextView) v.findViewById(R.id.wk_chat_msg_read);
             wk_chat_image = (NetworkImageView) v.findViewById(R.id.wk_chat_image);
             wk_chat_checkbox = (AppCompatCheckBox) v.findViewById(R.id.wk_chat_checkbox);
-
             wk_chat_message.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -129,10 +141,25 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         });
         if (getItemViewType(position) == viewType.MSG_SEND) {
             holder.wk_chat_image.setDefaultImageResId(R.drawable.ali_0);
+			if(position == getItemCount() -1 )
+			{
+				holder.wk_chat_msg_read.setVisibility(View.VISIBLE);
+				if(isRead())
+				{
+					holder.wk_chat_msg_read.setText("已读");
+				}else
+				{
+					holder.wk_chat_msg_read.setText("未读");
+				}
+				
+			}else
+			{
+				holder.wk_chat_msg_read.setVisibility(View.GONE);
+			}
         } else {
             holder.wk_chat_image.setDefaultImageResId(R.drawable.account);
         }
-
+		
         holder.mItem = items.get(position);
         holder.wk_chat_name.setText(items.get(position).getcSend());
         holder.wk_chat_message.setText(items.get(position).getMsgContent());

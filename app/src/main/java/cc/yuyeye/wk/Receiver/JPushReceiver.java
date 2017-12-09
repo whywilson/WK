@@ -40,7 +40,7 @@ import cc.yuyeye.wk.Util.TipViewController;
 import cn.jpush.android.api.JPushInterface;
 
 import static cc.yuyeye.wk.MainActivity.IMEI;
-import static cc.yuyeye.wk.Runnable.wkRunnable.wk_reportUrl;
+import static cc.yuyeye.wk.Runnable.wkTask.wk_reportUrl;
 
 public class JPushReceiver extends BroadcastReceiver implements TipViewController.ViewDismissHandler {
     public static int notification_id;
@@ -65,7 +65,6 @@ public class JPushReceiver extends BroadcastReceiver implements TipViewControlle
     private String currentTime;
     private MediaPlayer notifySound;
 
-    private Intent i;
     private ChatDb chatDb;
 
     private String messageContent;
@@ -203,7 +202,7 @@ public class JPushReceiver extends BroadcastReceiver implements TipViewControlle
     private void addMsgToList(String title, String content) {
         chatListBean = new chatListBean();
         chatListBean.setMeSend(false);
-        chatListBean.setIconUrl("http://bbs.tuling123.com/static/common/avatar-mid-img.png");
+     //   chatListBean.setIconUrl("http://bbs.tuling123.com/static/common/avatar-mid-img.png");
         chatListBean.setMsgContent(content);
         chatListBean.setcSend(title);
 
