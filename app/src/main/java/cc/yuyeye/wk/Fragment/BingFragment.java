@@ -19,8 +19,8 @@ import cc.yuyeye.wk.R;
 import static cc.yuyeye.wk.MainActivity.mImageCache;
 import static cc.yuyeye.wk.MainActivity.mImageLoader;
 import static cc.yuyeye.wk.MainActivity.mQueue;
-import static cc.yuyeye.wk.MainActivity.sDateFormat;
 import static cc.yuyeye.wk.Util.Images.imageUrls;
+import java.text.*;
 
 public class BingFragment extends Fragment {
     private String currentImageUrl = "";
@@ -98,6 +98,8 @@ public class BingFragment extends Fragment {
             calendar.setTime(dNow);
             calendar.add(Calendar.DAY_OF_MONTH, -i);
             dBefore = calendar.getTime();
+			SimpleDateFormat sDateFormat;
+			sDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.PRC);
             if (i < 30) {
                 imageUrls[i] = "https://yuyeye.cc/bing/bing_" + sDateFormat.format(dBefore).substring(0, 10) + ".jpg";
             } else {
