@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    
+
     android:title="@string/setting">
     <PreferenceCategory
         android:title="@string/personSetting">
@@ -14,19 +14,19 @@
             android:hint="@string/conditionToChangeID"
             android:imeOptions="actionDone"
             android:key="qq_edittext_key"
-            
+
             android:numeric="integer"
             android:title="@string/qqNum" />
     </PreferenceCategory>
     <PreferenceCategory
-        
+
         android:title="@string/appearanceSetting">
         <ListPreference
             android:dialogTitle="@string/ImageSourceSetting"
             android:entries="@array/imageSourceArray"
             android:entryValues="@array/imageSourceArrayValues"
             android:key="image_source"
-            
+
             android:title="@string/ImageSourceSetting" />
         <SwitchPreference
             android:defaultValue="true"
@@ -42,21 +42,15 @@
             android:title="@string/saveTipMsg" />
     </PreferenceCategory>
     <PreferenceCategory
-        
+
         android:title="@string/otherSetting">
         <SwitchPreference
             android:defaultValue="false"
             android:key="log_switch_key"
-            
-            android:title="@string/saveLog"
-             />
-		<SwitchPreference
-            android:defaultValue="false"
-            android:key="dev_update_key"
 
-            android:title="@string/betaUpdate"
+            android:title="@string/saveLog"
 		/>
-		</PreferenceCategory>
+	</PreferenceCategory>
     <Preference
         android:key="about_key"
         android:title="@string/about"/>

@@ -85,7 +85,7 @@ public class WkFragment extends Fragment
 				{
 					try
 					{
-						if (Common.isUpdate || Common.isBetaUpdate)
+						if (Common.isUpdate)
 						{
 							new Common.version(getActivity()).execute();
 						}

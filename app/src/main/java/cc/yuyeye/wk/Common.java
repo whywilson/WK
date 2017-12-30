@@ -28,8 +28,7 @@ import org.json.*;
 import cc.yuyeye.wk.R;
 
 
-public class Common extends Application
-{
+public class Common extends Application {
 	public static String wk_url = "https://api.yuyeye.cc/wk_url.php";
 	public static String url_domain;
 	public static String url_login;
@@ -39,7 +38,6 @@ public class Common extends Application
 	public static String new_version_name;
 	public static String new_version_log;
     public static Boolean isUpdate = false;
-    public static Boolean isBetaUpdate = false;
     public static String TAG = "WkApplication";
     public static Context context;
     public static BasicPushNotificationBuilder soundBuilder;
@@ -49,20 +47,17 @@ public class Common extends Application
     private CustomPushNotificationBuilder vibrateBuilder;
     private WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams();
 
-	public static SharedPreferences getSharedPreference()
-	{
+	public static SharedPreferences getSharedPreference() {
 		return sharedPreferences;
 	}
 
-    public WindowManager.LayoutParams getWkwmParams()
-	{
+    public WindowManager.LayoutParams getWkwmParams() {
         return wmParams;
     }
 
 
     @Override
-    public void onCreate()
-	{
+    public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
 
@@ -70,16 +65,13 @@ public class Common extends Application
         startJPush();
     }
 
-    public static Context getContext()
-	{
+    public static Context getContext() {
         return context;
     }
 
-    public void startJPush()
-	{
+    public void startJPush() {
         phoneAlias = sharedPreferences.getString(SettingUtil.ID_KEY, "");
-        if (phoneAlias != "")
-		{
+        if (phoneAlias != "") {
             JPushInterface.init(this);
             vibrateBuilder = new CustomPushNotificationBuilder(this, R.layout.customer_notitfication_layout, R.id.icon, R.id.title, R.id.text);
             vibrateBuilder.statusBarDrawable = R.drawable.ic_local_florist_white_48dp;
@@ -97,16 +89,14 @@ public class Common extends Application
 
             JPushInterface.setAlias(this, phoneAlias, new TagAliasCallback() {
 					@Override
-					public void gotResult(int i, String s, Set<String> set)
-					{
+					public void gotResult(int i, String s, Set<String> set) {
 						Log.d("JPush", "Set Tag result is " + s);
 					}
 				});
         }
     }
 
-    public static StringBuilder inputStreamToString(InputStream is)
-	{
+    public static StringBuilder inputStreamToString(InputStream is) {
         String line;
         StringBuilder total = new StringBuilder();
 
@@ -114,15 +104,11 @@ public class Common extends Application
         BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 
         // Read response until the end
-        try
-		{
-            while ((line = rd.readLine()) != null)
-			{
+        try {
+            while ((line = rd.readLine()) != null) {
                 total.append(line);
             }
-        }
-		catch (IOException e)
-		{
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -130,21 +116,18 @@ public class Common extends Application
         return total;
     }
 
-    public static String removeStr(String a, String b)
-	{
+    public static String removeStr(String a, String b) {
         return a.replaceAll(b, "");
     }
 
-	public static class url extends AsyncTask<Integer, Integer, String>
-	{
+	public static class url extends AsyncTask<Integer, Integer, String> {
 
         public String result;
         public InputStream is;
         public ArrayList<NameValuePair> nameValuePairs;
 
         @Override
-        protected void onPreExecute()
-		{
+        protected void onPreExecute() {
             result = "";
 
             nameValuePairs = new ArrayList<>();
@@ -155,42 +138,33 @@ public class Common extends Application
         }
 
         @Override
-        protected String doInBackground(Integer[] params)
-		{
-            try
-			{
+        protected String doInBackground(Integer[] params) {
+            try {
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpPost httppost = new HttpPost(wk_url);
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity entity = response.getEntity();
                 is = entity.getContent();
-            }
-			catch (Exception e)
-			{
+            } catch (Exception e) {
                 Log.e(TAG, "url httpClient" + e.toString());
             }
 
-            try
-			{
+            try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"), 8);
 
                 StringBuilder sb = new StringBuilder();
                 String line;
-                while ((line = reader.readLine()) != null)
-				{
+                while ((line = reader.readLine()) != null) {
                     sb.append(line + "\n");
                 }
                 is.close();
                 result = sb.toString();
-            }
-			catch (Exception e)
-			{
+            } catch (Exception e) {
                 Log.e(TAG, "url reader" + e.toString());
             }
 
-            try
-			{
+            try {
                 JSONArray jArray = new JSONArray(result);
                 JSONObject jsonObj = jArray.getJSONObject(0);
 				url_domain = jsonObj.getString("domain");
@@ -198,9 +172,7 @@ public class Common extends Application
 				url_version = url_domain + jsonObj.getString("version");
 				new_version_code = jsonObj.getInt("code");
                 new_version_name = jsonObj.getString("name");
-            }
-			catch (JSONException e)
-			{
+            } catch (JSONException e) {
                 Log.e(TAG, "url transfer " + e.toString());
             }
 
@@ -208,12 +180,8 @@ public class Common extends Application
         }
 
         @Override
-        protected void onPostExecute(String result)
-		{
-			if ((new_version_code > getVersionCode())
-				| (Integer.parseInt(new_version_name) > Integer.parseInt(getVersionName()) 
-				&& sharedPreferences.getBoolean(SettingUtil.DEV_UPDATE_KEY, false)))
-			{
+        protected void onPostExecute(String result) {
+			if ((new_version_code > getVersionCode())) {
 				new version(MainActivity.mContext).execute();
 			}
 
@@ -223,8 +191,7 @@ public class Common extends Application
         }
     }
 
-	public static class login extends AsyncTask<Integer, Integer, String>
-	{
+	public static class login extends AsyncTask<Integer, Integer, String> {
 
         public String result;
         public InputStream is;
@@ -232,8 +199,7 @@ public class Common extends Application
 		public int user_id = 0;
 
         @Override
-        protected void onPreExecute()
-		{
+        protected void onPreExecute() {
             result = "";
 
             is = null;
@@ -241,10 +207,8 @@ public class Common extends Application
         }
 
         @Override
-        protected String doInBackground(Integer[] params)
-		{
-            try
-			{
+        protected String doInBackground(Integer[] params) {
+            try {
 				String nettype = InternetUtil.getNetworkState(Common.getContext()) + "";
 				String localIp = InternetUtil.getLocalIp(Common.getContext()) + "";
 				String netIp = InternetUtil.getNetIp() + "";
@@ -264,40 +228,31 @@ public class Common extends Application
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity entity = response.getEntity();
                 is = entity.getContent();
-            }
-			catch (Exception e)
-			{
+            } catch (Exception e) {
                 Log.e(TAG, "login httpClient" + e.toString());
             }
 
-            try
-			{
+            try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"), 8);
 
                 StringBuilder sb = new StringBuilder();
                 String line;
-                while ((line = reader.readLine()) != null)
-				{
+                while ((line = reader.readLine()) != null) {
                     sb.append(line + "\n");
                 }
                 is.close();
                 result = sb.toString();
-            }
-			catch (Exception e)
-			{
+            } catch (Exception e) {
                 Log.e(TAG, "login reader" + e.toString());
             }
 
-            try
-			{
+            try {
                 JSONArray jArray = new JSONArray(result);
                 JSONObject jsonObj = jArray.getJSONObject(0);
 
                 user_id = jsonObj.getInt("id");
 
-            }
-			catch (JSONException e)
-			{
+            } catch (JSONException e) {
                 Log.e(TAG, "login transfer " + e.toString());
             }
 
@@ -305,30 +260,27 @@ public class Common extends Application
         }
 
         @Override
-        protected void onPostExecute(String result)
-		{
+        protected void onPostExecute(String result) {
             super.onPostExecute(result);
         }
     }
 
-	public static class version extends AsyncTask<Integer, Integer, String>
-	{
+	public static class version extends AsyncTask<Integer, Integer, String> {
 		public Context context;
 		public MaterialDialog check_version_dialog;
         public String result;
         public InputStream is;
         public ArrayList<NameValuePair> nameValuePairs;
 		public int user_id = 0;
+		int remote_version_code;
 
-		public version(Context context)
-		{
+		public version(Context context) {
 			super();
 			this.context = context;
 		}
 
         @Override
-        protected void onPreExecute()
-		{
+        protected void onPreExecute() {
             result = "";
 			check_version_dialog = new MaterialDialog.Builder(context)
 				.title(R.string.checking)
@@ -341,10 +293,8 @@ public class Common extends Application
         }
 
         @Override
-        protected String doInBackground(Integer[] params)
-		{
-            try
-			{
+        protected String doInBackground(Integer[] params) {
+            try {
 				nameValuePairs = new ArrayList<>();
 				nameValuePairs.add(new BasicNameValuePair("imei", MainActivity.IMEI));
 
@@ -354,42 +304,33 @@ public class Common extends Application
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity entity = response.getEntity();
                 is = entity.getContent();
-            }
-			catch (Exception e)
-			{
+            } catch (Exception e) {
                 Log.e(TAG, "version httpClient" + e.toString());
             }
 
-            try
-			{
+            try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"), 8);
 
                 StringBuilder sb = new StringBuilder();
                 String line;
-                while ((line = reader.readLine()) != null)
-				{
+                while ((line = reader.readLine()) != null) {
                     sb.append(line + "\n");
                 }
                 is.close();
                 result = sb.toString();
-            }
-			catch (Exception e)
-			{
+            } catch (Exception e) {
                 Log.e(TAG, "version reader" + e.toString());
             }
 
-            try
-			{
+            try {
                 JSONArray jArray = new JSONArray(result);
                 JSONObject jsonObj = jArray.getJSONObject(0);
 
-                new_version_code = jsonObj.getInt("version");
+                remote_version_code = jsonObj.getInt("version");
 				new_version_name = jsonObj.getString("vname");
 				new_version_log = jsonObj.getString("log");
 				url_apk = jsonObj.getString("apk");
-            }
-			catch (JSONException e)
-			{
+            } catch (JSONException e) {
                 Log.e(TAG, "version transfer " + e.toString());
             }
 
@@ -397,8 +338,7 @@ public class Common extends Application
         }
 
         @Override
-        protected void onPostExecute(String result)
-		{
+        protected void onPostExecute(String result) {
 			MaterialDialog update_log_dialog = new MaterialDialog.Builder(context)
 				.title(R.string.found_new_beta_version)
 				.content(new_version_log)
@@ -409,38 +349,23 @@ public class Common extends Application
 				.onPositive(new MaterialDialog.SingleButtonCallback(){
 
 					@Override
-					public void onClick(MaterialDialog p1, DialogAction p2)
-					{
+					public void onClick(MaterialDialog p1, DialogAction p2) {
 						new update(context).execute();
 					}
 				})
 				.onNegative(new MaterialDialog.SingleButtonCallback(){
 
 					@Override
-					public void onClick(MaterialDialog p1, DialogAction p2)
-					{
+					public void onClick(MaterialDialog p1, DialogAction p2) {
 						p1.dismiss();
 					}
 				})
 				.build();
-			if (new_version_code > getVersionCode())
-			{
+			if (remote_version_code > getVersionCode()) {
 				isUpdate = true;
 				update_log_dialog.setTitle(R.string.found_new_version);
 				update_log_dialog.show();
-			}
-			else if (sharedPreferences.getBoolean(SettingUtil.DEV_UPDATE_KEY, false))
-			{
-				if (Integer.parseInt(new_version_name) > Integer.parseInt(getVersionName()))
-				{
-					isBetaUpdate = true;
-					update_log_dialog.setTitle(R.string.found_new_beta_version);
-					update_log_dialog.show();
-
-				}
-			}
-			else
-			{
+			} else {
 				Toast.makeText(context, R.string.aleady_latest_version, Toast.LENGTH_LONG).show();
 			}
 			check_version_dialog.dismiss();
@@ -448,8 +373,7 @@ public class Common extends Application
         }
     }
 
-	public static class update extends AsyncTask<Integer, Integer, Integer>
-	{
+	public static class update extends AsyncTask<Integer, Integer, Integer> {
 		public Context context;
 		public MaterialDialog download_pkg_dialog;
         public ArrayList<NameValuePair> nameValuePairs;
@@ -461,16 +385,15 @@ public class Common extends Application
 		public static int down_status;
 		public Intent updateIntent;
 		public PendingIntent pendingIntent;
-
-		public update(Context context)
-		{
+		boolean stopDownload = false;
+		
+		public update(Context context) {
 			super();
 			this.context = context;
 		}
 
         @Override
-        protected void onPreExecute()
-		{
+        protected void onPreExecute() {
 			download_pkg_dialog = new MaterialDialog.Builder(context)
 				.title(R.string.downloading)
 				.progress(false, 100, true)
@@ -480,8 +403,8 @@ public class Common extends Application
 				.onNegative(new MaterialDialog.SingleButtonCallback(){
 
 					@Override
-					public void onClick(MaterialDialog p1, DialogAction p2)
-					{
+					public void onClick(MaterialDialog p1, DialogAction p2) {
+						stopDownload = true;
 						p1.dismiss();
 					}
 				})
@@ -492,10 +415,8 @@ public class Common extends Application
         }
 
         @Override
-        protected Integer doInBackground(Integer[] params)
-		{
-			try
-			{
+        protected Integer doInBackground(Integer[] params) {
+			try {
 				//down_status = (int)downloadUpdateFile(down_url, FileUtil.updateFile.toString());
 
 				int down_step = 1;// 提示step
@@ -512,38 +433,34 @@ public class Common extends Application
 				httpURLConnection.setReadTimeout(TIMEOUT);
 				// 获取下载文件的size
 				totalSize = httpURLConnection.getContentLength();
-				if (httpURLConnection.getResponseCode() == 404)
-				{
+				if (httpURLConnection.getResponseCode() == 404) {
 					throw new Exception("fail!");
 				}
 				inputStream = httpURLConnection.getInputStream();
 				outputStream = new FileOutputStream(FileUtil.updateFile.toString(), false);// 文件存在则覆盖掉
 				byte buffer[] = new byte[1024];
 				int readsize = 0;
-				while ((readsize = inputStream.read(buffer)) != -1)
-				{
+				while ((readsize = inputStream.read(buffer)) != -1) {
 					outputStream.write(buffer, 0, readsize);
 					downloadCount += readsize;// 时时获取下载到的大小
-
+					if(stopDownload){
+						return -1;
+					}
 					if (updateCount == 0
-						|| (downloadCount * 100 / totalSize - down_step) >= updateCount)
-					{
+						|| (downloadCount * 100 / totalSize - down_step) >= updateCount) {
 						updateCount += down_step;
 						download_pkg_dialog.incrementProgress(down_step);
 					}
 
 				}
-				if (httpURLConnection != null)
-				{
+				if (httpURLConnection != null) {
 					httpURLConnection.disconnect();
 				}
 				inputStream.close();
 				outputStream.close();
 
 				down_status = downloadCount;
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				Log.e(TAG, "update download " + e.toString());
 				e.printStackTrace();
 			}
@@ -552,77 +469,58 @@ public class Common extends Application
         }
 
         @Override
-        protected void onPostExecute(Integer result)
-		{
-			if (down_status > 0)
-			{
+        protected void onPostExecute(Integer result) {
+			if (down_status > 0 && !stopDownload) {
 				installApk(FileUtil.updateFile);
 //				Uri uri = Uri.fromFile(FileUtil.updateFile);
 //				Intent intent = new Intent(Intent.ACTION_VIEW);
 //				intent.setDataAndType(uri,"application/vnd.android.package-archive");
 //				context.startActivity(intent);
-			}
-			else
-			{
+			} else {
 				ToastUtil.showToast("下载失败");
 			}
 			download_pkg_dialog.dismiss();
             super.onPostExecute(result);
         }
 
-		protected void installApk(File file)
-		{
-			try
-			{
+		protected void installApk(File file) {
+			try {
 				Intent intent = new Intent(Intent.ACTION_VIEW);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-				{ // 7.0+以上版本
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // 7.0+以上版本
 					Uri apkUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);  //包名.fileprovider
 					intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
-				}
-				else
-				{
+				} else {
 					intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
 				}
 				context.startActivity(intent);
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				Log.e(TAG, "install apk " + e.toString());
 			}
 
 		}
     }
 
-	public static int getVersionCode()
-	{
+	public static int getVersionCode() {
         PackageManager packageManager = context.getPackageManager();
-        try
-		{
+        try {
             PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
             int versionCode = packageInfo.versionCode;
             return versionCode;
-        }
-		catch (PackageManager.NameNotFoundException e)
-		{
+        } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
 
         return -1;
     }
-	public static String getVersionName()
-	{
+	public static String getVersionName() {
         PackageManager packageManager = context.getPackageManager();
-        try
-		{
+        try {
             PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
             String versionName = packageInfo.versionName;
             return versionName;
-        }
-		catch (PackageManager.NameNotFoundException e)
-		{
+        } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
 
