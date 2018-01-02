@@ -34,8 +34,7 @@ public class WkFragment extends Fragment
     private int TuringCode;
     private String jokeContent;
 
-    public static WkFragment newInstance()
-	{
+    public static WkFragment newInstance() {
         return new WkFragment();
     }
 

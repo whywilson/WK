@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity
                 case 1:
                     return WkFragment.newInstance();
                 case 2:
+					//return CameraFragment.newInstance();
                     return BingFragment.newInstance();
                 default:
                     return WkFragment.newInstance();

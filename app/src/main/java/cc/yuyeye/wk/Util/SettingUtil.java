@@ -5,7 +5,7 @@ public class SettingUtil {
 	public final static String SHOW_NETTYPE_KEY = "show_nettype_key";
     public final static String ID_KEY = "id_edittext_key";
     public final static String QQ_KEY = "qq_edittext_key";
-    
+    public final static String HTTPS_KEY = "https_switch_key";
     public final static String LOG_KEY = "log_switch_key";
     public final static String ENTER_SEND_KEY = "enterSend_switch_key";
     public final static String SAVE_MSG_KEY = "saveMsg_switch_key";

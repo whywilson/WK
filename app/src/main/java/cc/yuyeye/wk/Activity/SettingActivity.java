@@ -53,6 +53,7 @@ public class SettingActivity extends PreferenceActivity implements OnSharedPrefe
             public boolean onPreferenceClick(Preference preference) {
 				MaterialDialog.Builder about_dialog = new MaterialDialog.Builder(SettingActivity.this)
 					.title(R.string.about)
+					.contentGravity(GravityEnum.CENTER)
 					.content(R.string.about_app)
 					.autoDismiss(false)
 					.positiveText(R.string.official_website)

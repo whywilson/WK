@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
-    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "cc.yuyeye.wk"
         minSdkVersion 19
@@ -37,6 +36,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+	compile 'com.squareup.okhttp3:okhttp:3.9.1'
     compile 'fr.tvbarthel.blurdialogfragment:lib:2.2.0'
     compile 'com.heinrichreimersoftware:material-intro:1.6.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'

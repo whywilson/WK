@@ -44,14 +44,19 @@
     <PreferenceCategory
 
         android:title="@string/otherSetting">
+		<SwitchPreference
+            android:defaultValue="true"
+            android:key="https_switch_key"
+            android:title="@string/useHttps"
+		/>
         <SwitchPreference
             android:defaultValue="false"
             android:key="log_switch_key"
-
             android:title="@string/saveLog"
 		/>
 	</PreferenceCategory>
     <Preference
         android:key="about_key"
+		android:textColor="@color/colorAccent"
         android:title="@string/about"/>
 </PreferenceScreen>

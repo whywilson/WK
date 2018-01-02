@@ -52,6 +52,12 @@
     <PreferenceCategory
         android:layout="@layout/preference_category_widget"
         android:title="@string/otherSetting">
+		<CheckBoxPreference
+            android:defaultValue="true"
+            android:key="https_switch_key"
+            android:layout="@layout/preference_item"
+            android:title="@string/useHttps"
+            android:widgetLayout="@layout/switch_layout" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="log_switch_key"
@@ -61,6 +67,7 @@
     </PreferenceCategory>
     <Preference
         android:key="about_key"
+		android:textColor="@color/colorAccent"
         android:layout="@layout/preference_item"
         android:title="@string/about" />
     <PreferenceCategory/>

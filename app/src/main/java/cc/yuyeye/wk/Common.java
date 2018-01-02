@@ -17,6 +17,7 @@ import com.afollestad.materialdialogs.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import okhttp3.*;
 import org.apache.http.*;
 import org.apache.http.client.*;
 import org.apache.http.client.entity.*;
@@ -29,7 +30,7 @@ import cc.yuyeye.wk.R;
 
 
 public class Common extends Application {
-	public static String wk_url = "https://api.yuyeye.cc/wk_url.php";
+	public static String wk_url;
 	public static String url_domain;
 	public static String url_login;
 	public static String url_version;
@@ -63,7 +64,20 @@ public class Common extends Application {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         startJPush();
+		
+		initUrl();
     }
+
+	public static void initUrl() {
+		if(sharedPreferences.getBoolean("https_switch_key", true)){
+			url_domain = "https://api.yuyeye.cc/";
+		}else{
+			url_domain = "http://api.yuyeye.cc/";
+		}
+		wk_url = url_domain + "wk_url.php";
+		url_login = url_domain + "wk_login.php";
+		url_version = url_domain + "wk_version.php";
+	}
 
     public static Context getContext() {
         return context;
@@ -139,37 +153,39 @@ public class Common extends Application {
 
         @Override
         protected String doInBackground(Integer[] params) {
-            try {
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost(wk_url);
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity entity = response.getEntity();
-                is = entity.getContent();
-            } catch (Exception e) {
-                Log.e(TAG, "url httpClient" + e.toString());
-            }
+			RequestBody requestBody = new FormBody.Builder()
+				.add("imei", MainActivity.IMEI)
+				.build();
+			try {
+				//InputStream inputStream = context.getAssets().open("api.crt");
+				OkHttpClient client = HttpsUtil.getTrustAllClient();
+				Request request = new Request.Builder()
+					.url(wk_url)
+					.post(requestBody)
+					.build();
+				Response response = client.newCall(request).execute();
+				result = response.body().string();
+			} catch (Exception e) {
+				Log.e(TAG, "url okhttps " + e.toString());
+			}
 
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"), 8);
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line + "\n");
-                }
-                is.close();
-                result = sb.toString();
-            } catch (Exception e) {
-                Log.e(TAG, "url reader" + e.toString());
-            }
+			if (result.equals("")) {
+				try {
+					OkHttpClient client = new OkHttpClient();
+					Request request = new Request.Builder()
+						.url(wk_url)
+						.post(requestBody)
+						.build();
+					Response response = client.newCall(request).execute();
+					result = response.body().string();
+				} catch (Exception e) {
+					Log.e(TAG, "url okhttp " + e.toString());
+				}
+			}
 
             try {
                 JSONArray jArray = new JSONArray(result);
                 JSONObject jsonObj = jArray.getJSONObject(0);
-				url_domain = jsonObj.getString("domain");
-                url_login = url_domain + jsonObj.getString("login");
-				url_version = url_domain + jsonObj.getString("version");
 				new_version_code = jsonObj.getInt("code");
                 new_version_name = jsonObj.getString("name");
             } catch (JSONException e) {
@@ -196,7 +212,6 @@ public class Common extends Application {
         public String result;
         public InputStream is;
         public ArrayList<NameValuePair> nameValuePairs;
-		public int user_id = 0;
 
         @Override
         protected void onPreExecute() {
@@ -208,52 +223,36 @@ public class Common extends Application {
 
         @Override
         protected String doInBackground(Integer[] params) {
-            try {
+			try {
 				String nettype = InternetUtil.getNetworkState(Common.getContext()) + "";
 				String localIp = InternetUtil.getLocalIp(Common.getContext()) + "";
 				String netIp = InternetUtil.getNetIp() + "";
-				nameValuePairs = new ArrayList<>();
-				nameValuePairs.add(new BasicNameValuePair("imei", MainActivity.IMEI));
-				nameValuePairs.add(new BasicNameValuePair("alias", phoneAlias));
-				nameValuePairs.add(new BasicNameValuePair("version", Integer.toString(getVersionCode())));
-				nameValuePairs.add(new BasicNameValuePair("vname", getVersionName()));
-				nameValuePairs.add(new BasicNameValuePair("nettype", nettype));
-				nameValuePairs.add(new BasicNameValuePair("local_ip", localIp));
-				nameValuePairs.add(new BasicNameValuePair("ip", netIp));
-
-
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost(url_login);
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity entity = response.getEntity();
-                is = entity.getContent();
-            } catch (Exception e) {
-                Log.e(TAG, "login httpClient" + e.toString());
-            }
-
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"), 8);
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line + "\n");
-                }
-                is.close();
-                result = sb.toString();
-            } catch (Exception e) {
-                Log.e(TAG, "login reader" + e.toString());
-            }
-
+				RequestBody requestBody = new FormBody.Builder()
+					.add("imei", MainActivity.IMEI)
+					.add("alias", phoneAlias)
+					.add("version", Integer.toString(getVersionCode()))
+					.add("vname", getVersionName())
+					.add("nettype", nettype)
+					.add("local_ip", localIp)
+					.add("ip", netIp)
+					.build();
+				//InputStream inputStream = context.getAssets().open("api.crt");
+				OkHttpClient client = HttpsUtil.getTrustAllClient();
+				Request request = new Request.Builder()
+					.url(url_login)
+					.post(requestBody)
+					.build();
+				Response response = client.newCall(request).execute();
+				result = response.body().string();
+			} catch (Exception e) {
+				Log.e(TAG, "login " + e.toString());
+			}
+			
             try {
                 JSONArray jArray = new JSONArray(result);
                 JSONObject jsonObj = jArray.getJSONObject(0);
-
-                user_id = jsonObj.getInt("id");
-
             } catch (JSONException e) {
-                Log.e(TAG, "login transfer " + e.toString());
+                Log.e(TAG, "login  " + e.toString());
             }
 
             return null;
@@ -294,34 +293,22 @@ public class Common extends Application {
 
         @Override
         protected String doInBackground(Integer[] params) {
-            try {
-				nameValuePairs = new ArrayList<>();
-				nameValuePairs.add(new BasicNameValuePair("imei", MainActivity.IMEI));
-
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost(url_version);
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity entity = response.getEntity();
-                is = entity.getContent();
-            } catch (Exception e) {
-                Log.e(TAG, "version httpClient" + e.toString());
-            }
-
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"), 8);
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line + "\n");
-                }
-                is.close();
-                result = sb.toString();
-            } catch (Exception e) {
-                Log.e(TAG, "version reader" + e.toString());
-            }
-
+			RequestBody requestBody = new FormBody.Builder()
+				.add("imei", MainActivity.IMEI)
+				.build();
+			try {
+				//InputStream inputStream = context.getAssets().open("api.crt");
+				OkHttpClient client = HttpsUtil.getTrustAllClient();
+				Request request = new Request.Builder()
+					.url(url_version)
+					.post(requestBody)
+					.build();
+				Response response = client.newCall(request).execute();
+				result = response.body().string();
+			} catch (Exception e) {
+				Log.e(TAG, "url okhttps " + e.toString());
+			}
+			
             try {
                 JSONArray jArray = new JSONArray(result);
                 JSONObject jsonObj = jArray.getJSONObject(0);
@@ -363,7 +350,7 @@ public class Common extends Application {
 				.build();
 			if (remote_version_code > getVersionCode()) {
 				isUpdate = true;
-				update_log_dialog.setTitle(R.string.found_new_version);
+				update_log_dialog.setTitle(context.getResources().getString(R.string.found_new_version) + new_version_name);
 				update_log_dialog.show();
 			} else {
 				Toast.makeText(context, R.string.aleady_latest_version, Toast.LENGTH_LONG).show();
@@ -386,7 +373,7 @@ public class Common extends Application {
 		public Intent updateIntent;
 		public PendingIntent pendingIntent;
 		boolean stopDownload = false;
-		
+
 		public update(Context context) {
 			super();
 			this.context = context;
@@ -443,7 +430,7 @@ public class Common extends Application {
 				while ((readsize = inputStream.read(buffer)) != -1) {
 					outputStream.write(buffer, 0, readsize);
 					downloadCount += readsize;// 时时获取下载到的大小
-					if(stopDownload){
+					if (stopDownload) {
 						return -1;
 					}
 					if (updateCount == 0
@@ -476,6 +463,8 @@ public class Common extends Application {
 //				Intent intent = new Intent(Intent.ACTION_VIEW);
 //				intent.setDataAndType(uri,"application/vnd.android.package-archive");
 //				context.startActivity(intent);
+			} else if (result == -1) {
+				ToastUtil.showToast("下载取消");
 			} else {
 				ToastUtil.showToast("下载失败");
 			}
