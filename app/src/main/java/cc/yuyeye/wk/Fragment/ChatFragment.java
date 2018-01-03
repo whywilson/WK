@@ -1,56 +1,87 @@
 package cc.yuyeye.wk.Fragment;
 
-import android.app.*;
-import android.content.*;
-import android.media.*;
-import android.os.*;
-import android.support.annotation.*;
-import android.support.v4.app.*;
-import android.support.v7.widget.*;
-import android.text.*;
-import android.util.*;
-import android.view.*;
-import android.view.View.*;
-import android.view.animation.*;
-import android.view.inputmethod.*;
-import android.widget.*;
-import cc.yuyeye.wk.*;
-import cc.yuyeye.wk.Activity.*;
-import cc.yuyeye.wk.Adapter.*;
-import cc.yuyeye.wk.DB.*;
-import cc.yuyeye.wk.Layout.*;
-import cc.yuyeye.wk.Runnable.*;
-import cc.yuyeye.wk.Util.*;
-import com.afollestad.materialdialogs.*;
-import com.android.volley.toolbox.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import org.apache.http.*;
-import org.apache.http.client.*;
-import org.apache.http.client.entity.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.impl.client.*;
-import org.apache.http.message.*;
-import org.json.*;
-
+import android.app.Service;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Vibrator;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import cc.yuyeye.wk.R;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSmoothScroller;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.android.volley.toolbox.ImageLoader;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import cc.yuyeye.wk.Activity.LoginActivity;
+import cc.yuyeye.wk.Adapter.ChatAdapter;
+import cc.yuyeye.wk.Common;
+import cc.yuyeye.wk.DB.ChatDb;
+import cc.yuyeye.wk.DB.chatListBean;
+import cc.yuyeye.wk.Layout.CircleImageView;
+import cc.yuyeye.wk.MainActivity;
+import cc.yuyeye.wk.R;
+import cc.yuyeye.wk.Runnable.wkTask;
+import cc.yuyeye.wk.Util.BitmapCache;
+import cc.yuyeye.wk.Util.InternetUtil;
+import cc.yuyeye.wk.Util.LogUtil;
+import cc.yuyeye.wk.Util.SettingUtil;
+import cc.yuyeye.wk.Util.TencentUtil;
+import cc.yuyeye.wk.Util.ToastUtil;
+import cn.jpush.android.api.JPushInterface;
+import okhttp3.FormBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import static cc.yuyeye.wk.MainActivity.SaveChatRecord;
 import static cc.yuyeye.wk.MainActivity.checkSendPerson;
 import static cc.yuyeye.wk.MainActivity.getCurrentTime;
-import static cc.yuyeye.wk.MainActivity.phoneAlias;
 import static cc.yuyeye.wk.MainActivity.mQueue;
+import static cc.yuyeye.wk.MainActivity.phoneAlias;
 import static cc.yuyeye.wk.MainActivity.sendPerson;
-import static cc.yuyeye.wk.Runnable.wkTask.wk_timeUrl;
-import cn.jpush.android.api.*;
-import okhttp3.*;
 
 public class ChatFragment extends Fragment {
 
-//    public static List<chatListBean> mChatDialogLists = new ArrayList<>();
+    //    public static List<chatListBean> mChatDialogLists = new ArrayList<>();
     public static List<chatListBean> mChatDialogLists = new ArrayList<>();
     public static EditText mChatMsg;
     public static LinearLayout mChatTools;
@@ -91,7 +122,7 @@ public class ChatFragment extends Fragment {
     private int contactId;
     private int deleteItemPosition = 0;
 
-	public static boolean isForeground = false;
+    public static boolean isForeground = false;
 
     public static ChatFragment newInstance() {
         return new ChatFragment();
@@ -108,18 +139,21 @@ public class ChatFragment extends Fragment {
             public void handleMessage(android.os.Message msg) {
                 int what = msg.what;
 
-                switch (what) {
-                    case -1: //列表底部
-                        chatAdaper.notifyItemChanged(what);
-                        chatRecyclerView.smoothScrollToPosition(chatAdaper.getItemCount());
-                        break;
-                    case -2: //列表顶部
-                        chatRecyclerView.smoothScrollToPosition(0);
-                        break;
-                    default:
-                        chatAdaper.notifyItemChanged(what);
-                        chatRecyclerView.scrollToPosition(what);
-                        break;
+                if (chatAdaper != null) {
+                    switch (what) {
+                        case -1: //列表底部
+                            chatAdaper.notifyItemChanged(what);
+                            chatRecyclerView.smoothScrollToPosition(chatAdaper.getItemCount());
+                            break;
+                        case -2: //列表顶部
+                            chatRecyclerView.smoothScrollToPosition(0);
+                            break;
+                        default:
+                            chatAdaper.notifyItemChanged(what);
+                            chatRecyclerView.scrollToPosition(what);
+                            break;
+                    }
+
                 }
             }
         };
@@ -132,7 +166,7 @@ public class ChatFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		if (phoneAlias.equals("")) {
+        if (phoneAlias.equals("")) {
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             startActivity(intent);
         } else {
@@ -172,22 +206,22 @@ public class ChatFragment extends Fragment {
         initContacts();
 
         mChatContactBar.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View p1) {
-					if (Common.getSharedPreference().getBoolean(SettingUtil.CONTACTS_TIPS, true)) {
-						ToastUtil.showToast(getResources().getString(R.string.longPressDeleteContact));
-						SharedPreferences.Editor editor = Common.getSharedPreference().edit();
-						editor.putBoolean(SettingUtil.CONTACTS_TIPS, false);
-						editor.apply();
-					}
-					showContactDialog();
-				}
-			});
+            @Override
+            public void onClick(View p1) {
+                if (Common.getSharedPreference().getBoolean(SettingUtil.CONTACTS_TIPS, true)) {
+                    ToastUtil.showToast(getResources().getString(R.string.longPressDeleteContact));
+                    SharedPreferences.Editor editor = Common.getSharedPreference().edit();
+                    editor.putBoolean(SettingUtil.CONTACTS_TIPS, false);
+                    editor.apply();
+                }
+                showContactDialog();
+            }
+        });
         mChatContactBar.setOnLongClickListener(new OnLongClickListener() {
 
-				@Override
-				public boolean onLongClick(View p1) {
-					new MaterialDialog.Builder(getActivity())
+            @Override
+            public boolean onLongClick(View p1) {
+                new MaterialDialog.Builder(getActivity())
                         .title(R.string.alert)
                         .content(getString(R.string.confirm_delete) + mChatContact.getText() + " ?")
                         .positiveText(R.string.confirm)
@@ -229,240 +263,240 @@ public class ChatFragment extends Fragment {
                             }
                         })
                         .show();
-					Vibrator vibrator = (Vibrator) getActivity().getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE);
-					long[] pattern = {0, 10, 40, 10};
-					vibrator.vibrate(pattern, -1);
-					return true;
-				}
-			});
+                Vibrator vibrator = (Vibrator) getActivity().getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE);
+                long[] pattern = {0, 10, 40, 10};
+                vibrator.vibrate(pattern, -1);
+                return true;
+            }
+        });
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false) {
-				@Override
-				public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
-					{
-						LinearSmoothScroller linearSmoothScroller =
+            @Override
+            public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
+                {
+                    LinearSmoothScroller linearSmoothScroller =
                             new LinearSmoothScroller(recyclerView.getContext()) {
-							@Override
-							protected int calculateTimeForScrolling(int dx) {
-								if (dx > 3000) {
-									dx = 3000;
-								}
-								return super.calculateTimeForScrolling(dx);
-							}
-						};
-						linearSmoothScroller.setTargetPosition(position);
-						startSmoothScroll(linearSmoothScroller);
-					}
-				}
-			});
+                                @Override
+                                protected int calculateTimeForScrolling(int dx) {
+                                    if (dx > 3000) {
+                                        dx = 3000;
+                                    }
+                                    return super.calculateTimeForScrolling(dx);
+                                }
+                            };
+                    linearSmoothScroller.setTargetPosition(position);
+                    startSmoothScroll(linearSmoothScroller);
+                }
+            }
+        });
 //        chatRecyclerView.setItemAnimator(new DefaultItemAnimator());
         chatRecyclerView.setAdapter(chatAdaper);
         chatMsgHandler.sendEmptyMessage(-1);
         mChatMsg.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 
-				@Override
-				public void onFocusChange(View p1, boolean p2) {
-					isEnterSend = Common.getSharedPreference().getBoolean(SettingUtil.ENTER_SEND_KEY, false);
+            @Override
+            public void onFocusChange(View p1, boolean p2) {
+                isEnterSend = Common.getSharedPreference().getBoolean(SettingUtil.ENTER_SEND_KEY, false);
 
-					mChatMsg.setSingleLine(isEnterSend);
-					if (isEnterSend) {
-						mChatMsg.setImeOptions(EditorInfo.IME_ACTION_SEND);
-					} else {
-						mChatMsg.setImeOptions(EditorInfo.IME_ACTION_GO);
-						mChatMsg.setMaxLines(10);
-					}
-				}
-			});
+                mChatMsg.setSingleLine(isEnterSend);
+                if (isEnterSend) {
+                    mChatMsg.setImeOptions(EditorInfo.IME_ACTION_SEND);
+                } else {
+                    mChatMsg.setImeOptions(EditorInfo.IME_ACTION_GO);
+                    mChatMsg.setMaxLines(10);
+                }
+            }
+        });
         mChatMsg.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-					try {
-						if (isEnterSend) {
-							if ((actionId == EditorInfo.IME_ACTION_SEND)
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                try {
+                    if (isEnterSend) {
+                        if ((actionId == EditorInfo.IME_ACTION_SEND)
                                 || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-								sendMSG(MSG_TYPE);
-								//让mPasswordEdit获取输入焦点
-								mChatMsg.requestFocus();
-								chatMsgHandler.sendEmptyMessage(-1);
-							}
-							return true;
-						} else {
-							return false;
-						}
-					} catch (Exception e) {
-						LogUtil.e("SendClick", e);
-						return false;
-					}
+                            sendMSG(MSG_TYPE);
+                            //让mPasswordEdit获取输入焦点
+                            mChatMsg.requestFocus();
+                            chatMsgHandler.sendEmptyMessage(-1);
+                        }
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    LogUtil.e("SendClick", e);
+                    return false;
+                }
 
-				}
-			});
+            }
+        });
         mChatMsg.addTextChangedListener(new TextWatcher() {
-				private CharSequence temp = "";
+            private CharSequence temp = "";
 
-				@Override
-				public void beforeTextChanged(CharSequence p1, int p2, int p3, int p4) {
-					temp = p1;
-				}
+            @Override
+            public void beforeTextChanged(CharSequence p1, int p2, int p3, int p4) {
+                temp = p1;
+            }
 
-				@Override
-				public void onTextChanged(CharSequence p1, int p2, int p3, int p4) {
-				}
+            @Override
+            public void onTextChanged(CharSequence p1, int p2, int p3, int p4) {
+            }
 
-				@Override
-				public void afterTextChanged(Editable p1) {
-					if (temp.length() > 0) {
-						mChatCircleImage.setImageResource(R.drawable.send);
-					} else {
-						setQqIcon(qq);
-					}
-				}
-			});
+            @Override
+            public void afterTextChanged(Editable p1) {
+                if (temp.length() > 0) {
+                    mChatCircleImage.setImageResource(R.drawable.send);
+                } else {
+                    setQqIcon(qq);
+                }
+            }
+        });
 
         mChatHeaderImage.setOnClickListener(new OnClickListener() {
 
-				@Override
+            @Override
 
-				public void onClick(View p1) {
-					SharedPreferences.Editor editor = Common.getSharedPreference().edit();
+            public void onClick(View p1) {
+                SharedPreferences.Editor editor = Common.getSharedPreference().edit();
 
-					if (MSG_TYPE == MSG_NOTIFICATION) {
-						MSG_TYPE = MSG_MESSAGE;
-						mChatHeaderImage.setImageResource(R.drawable.ic_incognito);
-						mChatMsg.setHint(getResources().getString(R.string.inputToastMsgContent));
-					} else if (MSG_TYPE == MSG_MESSAGE) {
-						MSG_TYPE = MSG_NOTIFICATION;
-						mChatHeaderImage.setImageResource(R.drawable.ic_notifications_white);
-						mChatMsg.setHint(getResources().getString(R.string.inputMsgContent));
-					}
-					editor.putInt(SettingUtil.MSG_TYPE_KEY, MSG_TYPE);
-					editor.apply();
-				}
-			});
+                if (MSG_TYPE == MSG_NOTIFICATION) {
+                    MSG_TYPE = MSG_MESSAGE;
+                    mChatHeaderImage.setImageResource(R.drawable.ic_incognito);
+                    mChatMsg.setHint(getResources().getString(R.string.inputToastMsgContent));
+                } else if (MSG_TYPE == MSG_MESSAGE) {
+                    MSG_TYPE = MSG_NOTIFICATION;
+                    mChatHeaderImage.setImageResource(R.drawable.ic_notifications_white);
+                    mChatMsg.setHint(getResources().getString(R.string.inputMsgContent));
+                }
+                editor.putInt(SettingUtil.MSG_TYPE_KEY, MSG_TYPE);
+                editor.apply();
+            }
+        });
         mChatCircleImage.setOnClickListener(new OnClickListener() {
 
-				@Override
-				public void onClick(View p1) {
-					sendMSG(MSG_TYPE);
-				}
-			});
+            @Override
+            public void onClick(View p1) {
+                sendMSG(MSG_TYPE);
+            }
+        });
         mChatCircleImage.setOnLongClickListener(new OnLongClickListener() {
 
-				@Override
-				public boolean onLongClick(View p1) {
-					if (mChatMsg.getText().toString().length() > 0) {
-						sendMSG(MSG_TYPE);
-					} else {
-						chooseQq();
-					}
-					return true;
-				}
+            @Override
+            public boolean onLongClick(View p1) {
+                if (mChatMsg.getText().toString().length() > 0) {
+                    sendMSG(MSG_TYPE);
+                } else {
+                    chooseQq();
+                }
+                return true;
+            }
 
-			});
-		if (chatAdaper != null) {
-			chatAdaper.setOnItemListener(new ChatAdapter.OnItemListener() {
-					@Override
-					public void OnItemClickListener(int position, ChatAdapter.ViewHolder vh) {
+        });
+        if (chatAdaper != null) {
+            chatAdaper.setOnItemListener(new ChatAdapter.OnItemListener() {
+                @Override
+                public void OnItemClickListener(int position, ChatAdapter.ViewHolder vh) {
 
-					}
+                }
 
-					@Override
-					public boolean OnItemLongClickListener(int position, ChatAdapter.ViewHolder vh) {
-						return true;
-					}
-				});
-		}
+                @Override
+                public boolean OnItemLongClickListener(int position, ChatAdapter.ViewHolder vh) {
+                    return true;
+                }
+            });
+        }
 
         mChatToolsShare.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					{
-						List<chatListBean> chat_dialog_id_list = chatAdaper.getChatDialogId();
-						if (chat_dialog_id_list.size() > 0) {
-							String share_msg = getString(R.string.with) + sendPerson + getString(R.string.chatRecords);
-							Intent share_intent = new Intent();
-							share_intent.setAction(Intent.ACTION_SEND);//设置分享行为
-							share_intent.setType("text/plain");//设置分享内容的类型
-							share_intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.with) + sendPerson + getString(R.string.chatRecords));//添加分享内容标题
+            @Override
+            public void onClick(View view) {
+                {
+                    List<chatListBean> chat_dialog_id_list = chatAdaper.getChatDialogId();
+                    if (chat_dialog_id_list.size() > 0) {
+                        String share_msg = getString(R.string.with) + sendPerson + getString(R.string.chatRecords);
+                        Intent share_intent = new Intent();
+                        share_intent.setAction(Intent.ACTION_SEND);//设置分享行为
+                        share_intent.setType("text/plain");//设置分享内容的类型
+                        share_intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.with) + sendPerson + getString(R.string.chatRecords));//添加分享内容标题
 
-							for (int i = 0; i < chat_dialog_id_list.size(); i++) {
-								share_msg += "\n" + chat_dialog_id_list.get(i).getTime();
-								share_msg += "\n" + chat_dialog_id_list.get(i).getcSend() + ": ";
-								share_msg += chat_dialog_id_list.get(i).getMsgContent();
-							}
-							share_intent.putExtra(Intent.EXTRA_TEXT, share_msg);//添加分享内容
-							//创建分享的Dialog
-							share_intent = Intent.createChooser(share_intent, getString(R.string.shareTo));
-							getActivity().startActivity(share_intent);
+                        for (int i = 0; i < chat_dialog_id_list.size(); i++) {
+                            share_msg += "\n" + chat_dialog_id_list.get(i).getTime();
+                            share_msg += "\n" + chat_dialog_id_list.get(i).getcSend() + ": ";
+                            share_msg += chat_dialog_id_list.get(i).getMsgContent();
+                        }
+                        share_intent.putExtra(Intent.EXTRA_TEXT, share_msg);//添加分享内容
+                        //创建分享的Dialog
+                        share_intent = Intent.createChooser(share_intent, getString(R.string.shareTo));
+                        getActivity().startActivity(share_intent);
 
-							chatAdaper.showActionBar(false);
-							chatAdaper.setActionMode();
-							chatAdaper.notifyDataSetChanged();
-						} else {
-							Toast.makeText(getActivity(), getString(R.string.NotSelectAnyRecords), Toast.LENGTH_SHORT).show();
-						}
-					}
-				}
-			});
+                        chatAdaper.showActionBar(false);
+                        chatAdaper.setActionMode();
+                        chatAdaper.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(getActivity(), getString(R.string.NotSelectAnyRecords), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
         mChatToolsCancel.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					chatAdaper.showActionBar(false);
-					chatAdaper.setActionMode();
-					chatAdaper.notifyDataSetChanged();
-					mChatToolsSelectAll.setText(R.string.selectAll);
+            @Override
+            public void onClick(View view) {
+                chatAdaper.showActionBar(false);
+                chatAdaper.setActionMode();
+                chatAdaper.notifyDataSetChanged();
+                mChatToolsSelectAll.setText(R.string.selectAll);
 //                chatMsgHandler.sendEmptyMessage(-1);
-				}
-			});
+            }
+        });
         mChatToolsSelectAll.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					List<Integer> chat_db_id_list = chatAdaper.getChatDbId();
-					if (chat_db_id_list.size() < chatAdaper.getItemCount()) {
-						chatAdaper.selectAllItem(true);
-						chatAdaper.notifyDataSetChanged();
-						mChatToolsSelectAll.setText(R.string.cancelSelectAll);
-					} else {
-						chatAdaper.selectAllItem(false);
-						mChatToolsSelectAll.setText(R.string.selectAll);
-					}
-				}
-			});
+            @Override
+            public void onClick(View view) {
+                List<Integer> chat_db_id_list = chatAdaper.getChatDbId();
+                if (chat_db_id_list.size() < chatAdaper.getItemCount()) {
+                    chatAdaper.selectAllItem(true);
+                    chatAdaper.notifyDataSetChanged();
+                    mChatToolsSelectAll.setText(R.string.cancelSelectAll);
+                } else {
+                    chatAdaper.selectAllItem(false);
+                    mChatToolsSelectAll.setText(R.string.selectAll);
+                }
+            }
+        });
         mChatToolsDelete.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					Map<Integer, Boolean> chat_checkBox_map = chatAdaper.getCheckBoxMap();
-					List<chatListBean> chat_dialog_id_list = chatAdaper.getChatDialogId();
-					List<Integer> chat_db_id_list = chatAdaper.getChatDbId();
-					if (chat_dialog_id_list.size() > 0 && chat_db_id_list.size() > 0) {
-						try {
-							for (int i = 0; i < chat_checkBox_map.size(); i++) {
-								if (chat_checkBox_map.get(i)) {
-									deleteItemPosition = i;
-									break;
-								}
-							}
-							for (int i = 0; i < chat_db_id_list.size(); i++) {
-								mChatDialogLists.remove(chat_dialog_id_list.get(i));
-								chatDb.deleteById(phoneAlias, chat_db_id_list.get(i));
-								//chatAdaper.notifyDataSetChanged();
-								chatAdaper.notifyItemRemoved(deleteItemPosition);
-								chatAdaper.notifyItemRangeChanged(deleteItemPosition, chatAdaper.getItemCount());
-							}
-							chatAdaper.selectAllItem(false);
+            @Override
+            public void onClick(View view) {
+                Map<Integer, Boolean> chat_checkBox_map = chatAdaper.getCheckBoxMap();
+                List<chatListBean> chat_dialog_id_list = chatAdaper.getChatDialogId();
+                List<Integer> chat_db_id_list = chatAdaper.getChatDbId();
+                if (chat_dialog_id_list.size() > 0 && chat_db_id_list.size() > 0) {
+                    try {
+                        for (int i = 0; i < chat_checkBox_map.size(); i++) {
+                            if (chat_checkBox_map.get(i)) {
+                                deleteItemPosition = i;
+                                break;
+                            }
+                        }
+                        for (int i = 0; i < chat_db_id_list.size(); i++) {
+                            mChatDialogLists.remove(chat_dialog_id_list.get(i));
+                            chatDb.deleteById(phoneAlias, chat_db_id_list.get(i));
+                            //chatAdaper.notifyDataSetChanged();
+                            chatAdaper.notifyItemRemoved(deleteItemPosition);
+                            chatAdaper.notifyItemRangeChanged(deleteItemPosition, chatAdaper.getItemCount());
+                        }
+                        chatAdaper.selectAllItem(false);
 
-							//  chatMsgHandler.sendEmptyMessage(deleteItemPosition);
-						} catch (Exception e) {
-							LogUtil.e("wk_delete", getString(R.string.deleteRecordsError) + e);
-						}
-					} else {
-						Toast.makeText(getActivity(), getString(R.string.NotSelectAnyRecords), Toast.LENGTH_SHORT).show();
-					}
-				}
-			});
+                        //  chatMsgHandler.sendEmptyMessage(deleteItemPosition);
+                    } catch (Exception e) {
+                        LogUtil.e("wk_delete", getString(R.string.deleteRecordsError) + e);
+                    }
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.NotSelectAnyRecords), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onResume() {
-		JPushInterface.clearAllNotifications(getActivity());
+        JPushInterface.clearAllNotifications(getActivity());
         if (InternetUtil.getNetworkState(getActivity()) != 0) {
             if (!Common.getSharedPreference().getBoolean(SettingUtil.SHOW_NETTYPE_KEY, true)) {
                 mChatNetStatusBar.setVisibility(View.GONE);
@@ -471,17 +505,19 @@ public class ChatFragment extends Fragment {
             }
             mChatNetType.setText("");
             mChatLastLoginTime.setText("");
-            wk_timeTask wkTask = new wk_timeTask();
-            wkTask.execute();
+            if (sendPerson != null) {
+                new wk_timeTask().execute();
+            }
+
         }
         super.onResume();
     }
 
-	@Override
-	public void setUserVisibleHint(boolean isVisibleToUser) {
-		isForeground = isVisibleToUser;
-		super.setUserVisibleHint(isVisibleToUser);
-	}
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        isForeground = isVisibleToUser;
+        super.setUserVisibleHint(isVisibleToUser);
+    }
 
     public void checkPhoneAlias() {
         phoneAlias = Common.getSharedPreference().getString(SettingUtil.ID_KEY, "");
@@ -504,7 +540,7 @@ public class ChatFragment extends Fragment {
 
 
     private void showContactDialog() {
-		contactList.clear();
+        contactList.clear();
         contactList.add(getResources().getString(R.string.allContacts));
         contactList.add(phoneAlias);
         try {
@@ -513,59 +549,59 @@ public class ChatFragment extends Fragment {
             Log.i("init", "iniContacts Error\n" + e);
         }
         new MaterialDialog.Builder(getActivity())
-			.titleGravity(GravityEnum.CENTER)
-			.titleColorRes(R.color.colorPrimary)
-			.title(R.string.contacts)
-			.items(contactList)
-			.itemsGravity(GravityEnum.CENTER)
-			.itemsCallback(new MaterialDialog.ListCallback() {
-				@Override
-				public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
-					SharedPreferences.Editor editor = Common.getSharedPreference().edit();
-					msgAcceptPerson = text.toString();
-					if (!sendPerson.equals(msgAcceptPerson)) {
-						// updateChatDialog();
-						editor.putString("sendPerson", msgAcceptPerson);
-					}
-					editor.apply();
-					contactId = position;
-					mChatContact.setText(msgAcceptPerson);
-					sendPerson = msgAcceptPerson;
-					updateChatDialog();
-				}
-			})
-			.negativeText(R.string.cancel)
-			.onNeutral(new MaterialDialog.SingleButtonCallback() {
-				@Override
-				public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-					addContactDialog();
-				}
-			})
-			.neutralColorRes(R.color.colorPrimary)
-			.neutralText(R.string.add)
-			.show();
+                .titleGravity(GravityEnum.CENTER)
+                .titleColorRes(R.color.colorPrimary)
+                .title(R.string.contacts)
+                .items(contactList)
+                .itemsGravity(GravityEnum.CENTER)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
+                        SharedPreferences.Editor editor = Common.getSharedPreference().edit();
+                        msgAcceptPerson = text.toString();
+                        if (!sendPerson.equals(msgAcceptPerson)) {
+                            // updateChatDialog();
+                            editor.putString("sendPerson", msgAcceptPerson);
+                        }
+                        editor.apply();
+                        contactId = position;
+                        mChatContact.setText(msgAcceptPerson);
+                        sendPerson = msgAcceptPerson;
+                        updateChatDialog();
+                    }
+                })
+                .negativeText(R.string.cancel)
+                .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        addContactDialog();
+                    }
+                })
+                .neutralColorRes(R.color.colorPrimary)
+                .neutralText(R.string.add)
+                .show();
     }
 
     private void addContactDialog() {
         new MaterialDialog.Builder(getActivity())
-			.title(R.string.add)
-			.inputRange(1, 20)
-			.input(getResources().getString(R.string.contacts), "", new MaterialDialog.InputCallback() {
-				@Override
-				public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-					String contact = input.toString();
-					SharedPreferences.Editor editor = Common.getSharedPreference().edit();
-					editor.putString("sendPerson", contact);
-					editor.apply();
-					contactList.add(contact);
-					mChatContact.setText(contact);
-					sendPerson = contact;
-					initChatDialog();
-				}
-			})
-			.positiveColorRes(R.color.colorPrimary)
-			.positiveText(R.string.confirm)
-			.show();
+                .title(R.string.add)
+                .inputRange(1, 20)
+                .input(getResources().getString(R.string.contacts), "", new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        String contact = input.toString();
+                        SharedPreferences.Editor editor = Common.getSharedPreference().edit();
+                        editor.putString("sendPerson", contact);
+                        editor.apply();
+                        contactList.add(contact);
+                        mChatContact.setText(contact);
+                        sendPerson = contact;
+                        initChatDialog();
+                    }
+                })
+                .positiveColorRes(R.color.colorPrimary)
+                .positiveText(R.string.confirm)
+                .show();
     }
 
     public void setTitleIcon() {
@@ -610,7 +646,7 @@ public class ChatFragment extends Fragment {
                     checkSendPerson();
                     //服务器添加数据库记录
 
-					new wkTask.msg_upload(getActivity(), phoneAlias, sendPerson, msgDetail).execute();
+                    new wkTask.msg_upload(getActivity(), phoneAlias, sendPerson, msgDetail).execute();
                     chatListBean chatListBean = new chatListBean();
                     chatListBean.setMeSend(true);
                     chatListBean.setMsgContent(mChatMsg.getText().toString());
@@ -626,7 +662,7 @@ public class ChatFragment extends Fragment {
                         dTask.execute();
                     } else {
                         //new Thread(runWk_notify).start();
-						new wkTask.wk_notify(getActivity(), msgAcceptPerson, msgTitle, msgDetail).execute();
+                        new wkTask.wk_notify(getActivity(), msgAcceptPerson, phoneAlias, msgDetail).execute();
                     }
                 } else {
                     ToastUtil.showToast(getResources().getString(R.string.networkError));
@@ -657,51 +693,51 @@ public class ChatFragment extends Fragment {
                 inputQq();
             } else {
                 new MaterialDialog.Builder(getActivity())
-					.title(R.string.selectQq)
-					.items(tencentUtil.getQqList())
-					.itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
-						@Override
-						public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-							qq = text.toString();
-							tencentUtil.saveQq(qq);
-							setQqIcon(qq);
-							return true;
-						}
-					})
-					.neutralText(R.string.inputQq)
-					.onNeutral(new MaterialDialog.SingleButtonCallback() {
-						@Override
-						public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-							inputQq();
-						}
-					})
-					.positiveText(R.string.confirm)
-					.show();
+                        .title(R.string.selectQq)
+                        .items(tencentUtil.getQqList())
+                        .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                qq = text.toString();
+                                tencentUtil.saveQq(qq);
+                                setQqIcon(qq);
+                                return true;
+                            }
+                        })
+                        .neutralText(R.string.inputQq)
+                        .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                inputQq();
+                            }
+                        })
+                        .positiveText(R.string.confirm)
+                        .show();
             }
         }
     }
 
     public void inputQq() {
         MaterialDialog inputQqDialog = new MaterialDialog.Builder(getActivity())
-			.title(R.string.inputQq)
-			.inputRangeRes(5, 11, R.color.colorAccent)
-			.positiveText(R.string.confirm)
-			.negativeText(R.string.cancel)
-			.negativeColorRes(R.color.colorAccent)
-			.positiveColorRes(R.color.colorPrimary)
-			.cancelable(false)
-			.inputType(InputType.TYPE_CLASS_NUMBER)
-			.input("QQ", "", new MaterialDialog.InputCallback() {
-				@Override
-				public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-					if (input.length() != 0) {
-						tencentUtil.saveQq(input.toString());
-					} else {
-						ToastUtil.showSimpleToast("QQ号不可为空");
-					}
-				}
-			})
-			.build();
+                .title(R.string.inputQq)
+                .inputRangeRes(5, 11, R.color.colorAccent)
+                .positiveText(R.string.confirm)
+                .negativeText(R.string.cancel)
+                .negativeColorRes(R.color.colorAccent)
+                .positiveColorRes(R.color.colorPrimary)
+                .cancelable(false)
+                .inputType(InputType.TYPE_CLASS_NUMBER)
+                .input("QQ", "", new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        if (input.length() != 0) {
+                            tencentUtil.saveQq(input.toString());
+                        } else {
+                            ToastUtil.showSimpleToast("QQ号不可为空");
+                        }
+                    }
+                })
+                .build();
         inputQqDialog.show();
     }
 
@@ -709,12 +745,12 @@ public class ChatFragment extends Fragment {
     public void updateChatDialog() {
         checkSendPerson();
         //initChatDialog();
-		try {
+        try {
             mChatDialogLists = chatDb.getChatRecord(phoneAlias, sendPerson, phoneAlias);
             chatAdaper = new ChatAdapter(getActivity(), mChatDialogLists);
-			chatRecyclerView.setAdapter(chatAdaper);
-			chatRecyclerView.smoothScrollToPosition(chatAdaper.getItemCount());
-			chatMsgHandler.sendEmptyMessage(-1);
+            chatRecyclerView.setAdapter(chatAdaper);
+            chatRecyclerView.smoothScrollToPosition(chatAdaper.getItemCount());
+            chatMsgHandler.sendEmptyMessage(-1);
         } catch (Exception e) {
             LogUtil.e("init", "initChat Error " + e);
         }
@@ -767,12 +803,12 @@ public class ChatFragment extends Fragment {
 
             if (!msgDetail.equals("")) {
                 //服务器API发送通知
-				new wkTask.wk_message(getActivity(), sendPerson, phoneAlias, msgDetail, "").execute();
+                new wkTask.wk_message(getActivity(), sendPerson, phoneAlias, msgDetail, "").execute();
 //                new Thread(wkTask.runWk_message).start();
                 //服务器添加数据库记录
                 if (Common.getSharedPreference().getBoolean(SettingUtil.SAVE_MSG_KEY, false)) {
                     checkSendPerson();
-					new wkTask.msg_upload(getActivity(), phoneAlias, sendPerson, msgDetail).execute();
+                    new wkTask.msg_upload(getActivity(), phoneAlias, sendPerson, msgDetail).execute();
 
                     chatListBean chatListBean = new chatListBean();
                     chatListBean.setMeSend(true);
@@ -788,22 +824,22 @@ public class ChatFragment extends Fragment {
                 Animation animSwing = AnimationUtils.loadAnimation(getActivity(), R.anim.swing_wide);
                 animSwing.setAnimationListener(new Animation.AnimationListener() {
 
-						@Override
-						public void onAnimationStart(Animation p1) {
-							mChatMsg.setText("");
-							mChatMsg.setHint(getResources().getString(R.string.inputToastMsgContent));
-						}
+                    @Override
+                    public void onAnimationStart(Animation p1) {
+                        mChatMsg.setText("");
+                        mChatMsg.setHint(getResources().getString(R.string.inputToastMsgContent));
+                    }
 
-						@Override
-						public void onAnimationEnd(Animation p1) {
-							mChatMsg.setHint(getResources().getString(R.string.inputToastMsgContent));
-						}
+                    @Override
+                    public void onAnimationEnd(Animation p1) {
+                        mChatMsg.setHint(getResources().getString(R.string.inputToastMsgContent));
+                    }
 
-						@Override
-						public void onAnimationRepeat(Animation p1) {
+                    @Override
+                    public void onAnimationRepeat(Animation p1) {
 
-						}
-					});
+                    }
+                });
                 mChatCircleImage.startAnimation(animSwing);
                 MediaPlayer sendSound = MediaPlayer.create(getActivity(), R.raw.msg_send);
                 sendSound.start();
@@ -815,39 +851,33 @@ public class ChatFragment extends Fragment {
     public class wk_timeTask extends AsyncTask<Integer, Integer, String> {
 
         private String result;
-        private InputStream is;
-		String send_msg_time;
-		boolean isRead = false;
-        private ArrayList<NameValuePair> nameValuePairs;
+        String send_msg_time;
+        boolean isRead = false;
 
         @Override
         protected void onPreExecute() {
             result = "";
-			chatAdaper.setIsRead(isRead);
-            nameValuePairs = new ArrayList<>();
-            nameValuePairs.add(new BasicNameValuePair("alias", sendPerson));
-			nameValuePairs.add(new BasicNameValuePair("accept", phoneAlias));
-            is = null;
+            if (chatAdaper != null) {
+                chatAdaper.setIsRead(isRead);
+            }
             super.onPreExecute();
         }
 
         @Override
         protected String doInBackground(Integer[] params) {
-
-
-			try {
-				RequestBody requestBody = new FormBody.Builder()
-					.add("alias", sendPerson)
-					.add("accept", phoneAlias)
-					.build();
-				//InputStream inputStream = context.getAssets().open("api.crt");
+            try {
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("alias", sendPerson)
+                        .add("accept", phoneAlias)
+                        .build();
+                //InputStream inputStream = context.getAssets().open("api.crt");
 //				OkHttpClient client = HttpsUtil.getTrustAllClient();
-				Request request = new Request.Builder()
-					.url(wkTask.wk_timeUrl)
-					.post(requestBody)
-					.build();
-				Response response = Common.mClient.newCall(request).execute();
-				result = response.body().string();
+                Request request = new Request.Builder()
+                        .url(wkTask.wk_timeUrl)
+                        .post(requestBody)
+                        .build();
+                Response response = Common.mClient.newCall(request).execute();
+                result = response.body().string();
             } catch (Exception e) {
                 LogUtil.e("wktime", "连接失败" + e.toString());
             }
@@ -857,7 +887,7 @@ public class ChatFragment extends Fragment {
                 JSONObject jsonObj = jArray.getJSONObject(0);
                 lastLoginTime = jsonObj.getString("time");
                 chatNetType = jsonObj.getInt("nettype");
-				send_msg_time = jsonObj.getString("msg_time");
+                send_msg_time = jsonObj.getString("msg_time");
             } catch (JSONException e) {
                 LogUtil.e("wktime", "解析失败 " + e.toString() + "\nResult: " + result);
             }
@@ -867,8 +897,8 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            if (!Objects.equals(sendPerson, getActivity().getResources().getString(R.string.allContacts)) 
-				&& !Objects.equals(sendPerson, getActivity().getResources().getString(R.string.Turing))) {
+            if (!Objects.equals(sendPerson, getActivity().getResources().getString(R.string.allContacts))
+                    && !Objects.equals(sendPerson, getActivity().getResources().getString(R.string.Turing))) {
                 Animation animLoading = AnimationUtils.loadAnimation(getActivity(), R.anim.popupfromtop_enter);
                 switch (chatNetType) {
                     case 0:
@@ -897,78 +927,69 @@ public class ChatFragment extends Fragment {
                 mChatLastLoginTime.setText(lastLoginTime);
                 mChatLastLoginTime.startAnimation(animLoading);
 
-				try {
-					isRead = compare(send_msg_time, lastLoginTime);
-					chatAdaper.setIsRead(isRead);
-					chatAdaper.notifyItemChanged(chatAdaper.getItemCount());
-				} catch (Exception e) {
-					LogUtil.e("wktime", result + "\n解析失败 " + e.toString());
-				}} else {
-				if (isForeground) {
-					mChatLastLoginTime.setText(lastLoginTime);
-				}         
+                try {
+                    isRead = compare(send_msg_time, lastLoginTime);
+                    chatAdaper.setIsRead(isRead);
+                    chatAdaper.notifyItemChanged(chatAdaper.getItemCount());
+                } catch (Exception e) {
+                    LogUtil.e("wktime", result + "\n解析失败 " + e.toString());
+                }
+            } else {
+                if (isForeground) {
+                    mChatLastLoginTime.setText(lastLoginTime);
+                }
             }
             super.onPostExecute(result);
         }
     }
 
-	public boolean compare(String time1, String time2) throws ParseException {
-		//如果想比较日期则写成"yyyy-MM-dd"就可以了
-		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		//将字符串形式的时间转化为Date类型的时间
-		Date a=sdf.parse(time1);
-		Date b=sdf.parse(time2);
-		//Date类的一个方法，如果a早于b返回true，否则返回false
-		if (a.before(b))
-			return true;
-		else
-			return false;
-		/*
-		 * 如果你不喜欢用上面这个太流氓的方法，也可以根据将Date转换成毫秒
+    public boolean compare(String time1, String time2) throws ParseException {
+        //如果想比较日期则写成"yyyy-MM-dd"就可以了
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        //将字符串形式的时间转化为Date类型的时间
+        Date a = sdf.parse(time1);
+        Date b = sdf.parse(time2);
+        //Date类的一个方法，如果a早于b返回true，否则返回false
+        if (a.before(b))
+            return true;
+        else
+            return false;
+        /*
+         * 如果你不喜欢用上面这个太流氓的方法，也可以根据将Date转换成毫秒
 		 if(a.getTime()-b.getTime()<0)
 		 return true;
 		 else
 		 return false;
 		 */
-	}
+    }
 
     public class TuringTask extends AsyncTask<Integer, Integer, String> {
 
         private String result;
-        private InputStream is;
-        private ArrayList<NameValuePair> nameValuePairs;
 
-        //后面尖括号内分别是参数（例子里是线程休息时间），进度（publishProgress用到），返回值类型
         @Override
         protected void onPreExecute() {
             result = "";
-
-            nameValuePairs = new ArrayList<>();
-            nameValuePairs.add(new BasicNameValuePair("key", "0aad89b1e6b74ab5932fe584269ea531"));
-            nameValuePairs.add(new BasicNameValuePair("info", msgDetail));
-            nameValuePairs.add(new BasicNameValuePair("userid", phoneAlias));
-
-            is = null;
             super.onPreExecute();
         }
 
         @Override
         protected String doInBackground(Integer[] params) {
-			RequestBody requestBody = new FormBody.Builder()
-				.add("key", "0aad89b1e6b74ab5932fe584269ea531")
-				.add("info", msgDetail)
-				.add("userid", phoneAlias)
-				.build();
-			try {
-				Request request = new Request.Builder()
-					.url("http://www.tuling123.com/openapi/api")
-					.post(requestBody)
-					.build();
-				Response response = Common.mClient.newCall(request).execute();
-				result = response.body().string();
-			} catch (Exception e) {
-				Log.e("turing", "url  " + e.toString());
-			}
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("key", "0aad89b1e6b74ab5932fe584269ea531")
+                    .add("info", msgDetail)
+                    .add("userid", phoneAlias)
+                    .build();
+            try {
+                Request request = new Request.Builder()
+                        .url("http://www.tuling123.com/openapi/api")
+                        .post(requestBody)
+                        .build();
+                Response response = Common.mClient.newCall(request).execute();
+                result = response.body().string();
+            } catch (Exception e) {
+                Log.e("turing", "url  " + e.toString());
+            }
 
             try {
                 JSONObject jsonObj = new JSONObject(result);
@@ -1007,7 +1028,7 @@ public class ChatFragment extends Fragment {
                 sendPerson = phoneAlias;
                 phoneAlias = getResources().getString(R.string.Turing);
                 msgDetail = result;
-				new wkTask.msg_upload(getActivity(), phoneAlias, sendPerson, msgDetail).execute();
+                new wkTask.msg_upload(getActivity(), phoneAlias, sendPerson, msgDetail).execute();
             }
 
         }

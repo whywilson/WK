@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity
     private TabLayout tabLayout;
 
 	private int REQUEST_CODE_ASK_PHONE_STATE = 1;
+	private int REQUEST_CODE_WRITE_CONTACTS = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,6 +62,10 @@ public class MainActivity extends AppCompatActivity
 		
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE_ASK_PHONE_STATE);
+            return;
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_CODE_WRITE_CONTACTS);
             return;
         }
 		

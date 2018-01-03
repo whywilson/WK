@@ -1,32 +1,55 @@
 package cc.yuyeye.wk;
 
-import android.app.*;
-import android.content.*;
-import android.content.pm.*;
-import android.net.*;
-import android.os.*;
-import android.preference.*;
-import android.support.v4.content.*;
-import android.util.*;
-import android.view.*;
-import android.widget.*;
-import cc.yuyeye.wk.*;
-import cc.yuyeye.wk.Util.*;
-import cn.jpush.android.api.*;
-import com.afollestad.materialdialogs.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import okhttp3.*;
-import org.apache.http.*;
-import org.apache.http.client.*;
-import org.apache.http.client.entity.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.impl.client.*;
-import org.apache.http.message.*;
-import org.json.*;
+import android.app.Application;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.preference.PreferenceManager;
+import android.support.v4.content.FileProvider;
+import android.util.Log;
+import android.view.WindowManager;
+import android.widget.Toast;
 
-import cc.yuyeye.wk.R;
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Set;
+
+import cc.yuyeye.wk.Util.FileUtil;
+import cc.yuyeye.wk.Util.HttpsUtil;
+import cc.yuyeye.wk.Util.InternetUtil;
+import cc.yuyeye.wk.Util.SettingUtil;
+import cc.yuyeye.wk.Util.ToastUtil;
+import cn.jpush.android.api.BasicPushNotificationBuilder;
+import cn.jpush.android.api.CustomPushNotificationBuilder;
+import cn.jpush.android.api.JPushInterface;
+import cn.jpush.android.api.TagAliasCallback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 public class Common extends Application {
@@ -140,17 +163,10 @@ public class Common extends Application {
 	public static class url extends AsyncTask<Integer, Integer, String> {
 
         public String result;
-        public InputStream is;
-        public ArrayList<NameValuePair> nameValuePairs;
 
         @Override
         protected void onPreExecute() {
             result = "";
-
-            nameValuePairs = new ArrayList<>();
-            nameValuePairs.add(new BasicNameValuePair("imei", MainActivity.IMEI));
-
-            is = null;
             super.onPreExecute();
         }
 
@@ -211,14 +227,10 @@ public class Common extends Application {
 	public static class login extends AsyncTask<Integer, Integer, String> {
 
         public String result;
-        public InputStream is;
-        public ArrayList<NameValuePair> nameValuePairs;
 
         @Override
         protected void onPreExecute() {
             result = "";
-
-            is = null;
             super.onPreExecute();
         }
 
@@ -269,7 +281,6 @@ public class Common extends Application {
 		public MaterialDialog check_version_dialog;
         public String result;
         public InputStream is;
-        public ArrayList<NameValuePair> nameValuePairs;
 		public int user_id = 0;
 		int remote_version_code;
 
@@ -304,7 +315,7 @@ public class Common extends Application {
 				Response response = mClient.newCall(request).execute();
 				result = response.body().string();
 			} catch (Exception e) {
-				Log.e(TAG, "url okhttps " + e.toString());
+				Log.e(TAG, "url version " + e.toString());
 			}
 			
             try {
@@ -361,15 +372,11 @@ public class Common extends Application {
 	public static class update extends AsyncTask<Integer, Integer, Integer> {
 		public Context context;
 		public MaterialDialog download_pkg_dialog;
-        public ArrayList<NameValuePair> nameValuePairs;
 
 		public static final int TIMEOUT = 10 * 1000;// 超时
-		public static String down_url = Common.url_apk;
 		public static final int DOWN_OK = 1;
 		public static final int DOWN_ERROR = 0;
 		public static int down_status;
-		public Intent updateIntent;
-		public PendingIntent pendingIntent;
 		boolean stopDownload = false;
 
 		public update(Context context) {

@@ -103,7 +103,11 @@ public class BingFragment extends Fragment {
             if (i < 30) {
                 imageUrls[i] = "https://yuyeye.cc/bing/bing_" + sDateFormat.format(dBefore).substring(0, 10) + ".jpg";
             } else {
-                mQueue.getCache().remove("https://yuyeye.cc/bing/bing_" + sDateFormat.format(dBefore).substring(0, 10) + ".jpg");
+                try {
+                    mQueue.getCache().remove("https://yuyeye.cc/bing/bing_" + sDateFormat.format(dBefore).substring(0, 10) + ".jpg");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         currentImageUrl = imageUrls[0];

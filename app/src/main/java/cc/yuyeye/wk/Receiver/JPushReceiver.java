@@ -10,19 +10,10 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -38,6 +29,9 @@ import cc.yuyeye.wk.Util.LogUtil;
 import cc.yuyeye.wk.Util.SettingUtil;
 import cc.yuyeye.wk.Util.TipViewController;
 import cn.jpush.android.api.JPushInterface;
+import okhttp3.FormBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 import static cc.yuyeye.wk.MainActivity.IMEI;
 import static cc.yuyeye.wk.Runnable.wkTask.wk_reportUrl;
@@ -93,11 +87,11 @@ public class JPushReceiver extends BroadcastReceiver implements TipViewControlle
             String report;
 
             if (!TextUtils.isEmpty(extras)) {
-                try{
+                try {
                     JSONObject extraJson = new JSONObject(extras);
-                    if(extraJson.length() > 0){
+                    if (extraJson.length() > 0) {
                         report = extraJson.getString("report");
-                        if(report.equals("now")){
+                        if (report.equals("now")) {
                             new Thread(runWk_reportNow).start();
                         }
                     }
@@ -202,7 +196,7 @@ public class JPushReceiver extends BroadcastReceiver implements TipViewControlle
     private void addMsgToList(String title, String content) {
         chatListBean = new chatListBean();
         chatListBean.setMeSend(false);
-     //   chatListBean.setIconUrl("http://bbs.tuling123.com/static/common/avatar-mid-img.png");
+        //   chatListBean.setIconUrl("http://bbs.tuling123.com/static/common/avatar-mid-img.png");
         chatListBean.setMsgContent(content);
         chatListBean.setcSend(title);
 
@@ -238,24 +232,25 @@ public class JPushReceiver extends BroadcastReceiver implements TipViewControlle
         public void run() {
             String netType = InternetUtil.getNetworkState(Common.getContext()) + "";
             String localIp = InternetUtil.getLocalIp(Common.getContext()) + "";
-            String netIp = InternetUtil.getNetIp()+"";
+            String netIp = InternetUtil.getNetIp() + "";
 
-            ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
-
-            nameValuePairs.add(new BasicNameValuePair("IMEI", IMEI));
-            nameValuePairs.add(new BasicNameValuePair("alias", phoneAlias));
-            nameValuePairs.add(new BasicNameValuePair("nettype", netType));
-            nameValuePairs.add(new BasicNameValuePair("ip", netIp));
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("IMEI", IMEI)
+                    .add("alias", phoneAlias)
+                    .add("nettype", netType)
+                    .add("ip", netIp)
+                    .add("local_ip", localIp)
+                    .build();
             try {
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost(wk_reportUrl);
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity entity = response.getEntity();
-                entity.getContent();
+                Request request = new Request.Builder()
+                        .url(wk_reportUrl)
+                        .post(requestBody)
+                        .build();
+                Common.mClient.newCall(request).execute();
             } catch (Exception e) {
-                Log.e("log_tag", "联网错误 " + e.toString());
+                Log.e(TAG, "url report " + e.toString());
             }
+
         }
     };
 

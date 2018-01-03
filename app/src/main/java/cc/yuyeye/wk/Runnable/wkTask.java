@@ -1,18 +1,18 @@
 package cc.yuyeye.wk.Runnable;
 
-import android.content.*;
-import android.os.*;
-import android.util.*;
-import cc.yuyeye.wk.*;
-import cc.yuyeye.wk.Util.*;
-import okhttp3.*;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
 
+import cc.yuyeye.wk.Common;
+import cc.yuyeye.wk.Util.ToastUtil;
+import okhttp3.FormBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+
+import static cc.yuyeye.wk.Fragment.ChatFragment.msgDetail;
 import static cc.yuyeye.wk.MainActivity.IMEI;
 import static cc.yuyeye.wk.MainActivity.getCurrentTime;
-import static cc.yuyeye.wk.Fragment.ChatFragment.msgDetail;
-import static cc.yuyeye.wk.MainActivity.phoneAlias;
-import static cc.yuyeye.wk.MainActivity.sendPerson;
-import static org.apache.http.protocol.HTTP.UTF_8;
 
 public class wkTask {
     public static String wk_notifyUrl = Common.url_domain + "wk_notify.php";
@@ -22,7 +22,6 @@ public class wkTask {
     public static String wk_timeUrl = Common.url_domain + "wk_time.php";
     public static String wk_msgAddUrl = Common.url_domain + "wk_msgAdd.php";
 	public static String report = "";
-    private static String currentTime;
 
 	public static class msg_upload extends AsyncTask<Integer, Integer, Integer> {
 		Context context;

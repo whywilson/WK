@@ -1,29 +1,46 @@
 package cc.yuyeye.wk.Fragment;
 
-import android.content.*;
-import android.graphics.*;
-import android.os.*;
-import android.support.v4.app.*;
-import android.util.*;
-import android.view.*;
-import android.view.animation.*;
-import android.widget.*;
-import cc.yuyeye.wk.*;
-import cc.yuyeye.wk.Activity.*;
-import cc.yuyeye.wk.Util.*;
-import java.io.*;
-import java.util.*;
-import org.apache.http.*;
-import org.apache.http.client.*;
-import org.apache.http.client.entity.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.impl.client.*;
-import org.apache.http.message.*;
-import org.json.*;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Objects;
+
+import cc.yuyeye.wk.Activity.CanteenIntroActivity;
+import cc.yuyeye.wk.Activity.LoveCounter;
+import cc.yuyeye.wk.Activity.SettingActivity;
+import cc.yuyeye.wk.Common;
+import cc.yuyeye.wk.R;
+import cc.yuyeye.wk.Util.InternetUtil;
+import cc.yuyeye.wk.Util.LogUtil;
+import cc.yuyeye.wk.Util.ScreenUtil;
+import cc.yuyeye.wk.Util.ToastUtil;
+import okhttp3.FormBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import static cc.yuyeye.wk.MainActivity.isWkOrNot;
 import static cc.yuyeye.wk.MainActivity.phoneAlias;
-import okhttp3.*;
 
 public class WkFragment extends Fragment
 {
