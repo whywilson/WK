@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -51,9 +52,10 @@ public class WkFragment extends Fragment implements SensorEventListener
     private LinearLayout mainLayout;
     private LinearLayout wkImageView;
     private int Reset;
-    private boolean TuringJoke;
     private int TuringCode;
     private String jokeContent;
+    private Sensor mSensor;
+    private SensorManager mSensorManager;
 
     public static WkFragment newInstance() {
         return new WkFragment();
@@ -63,6 +65,10 @@ public class WkFragment extends Fragment implements SensorEventListener
     public void onCreate(Bundle savedInstanceState)
 	{
         Reset = 0;
+        // 获取传感器管理对象
+        mSensorManager = (SensorManager) getActivity().getSystemService(getActivity().SENSOR_SERVICE);
+        // 获取传感器的类型(TYPE_ACCELEROMETER:加速度传感器)
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         super.onCreate(savedInstanceState);
     }
 
@@ -70,6 +76,19 @@ public class WkFragment extends Fragment implements SensorEventListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
         return inflater.inflate(R.layout.tab_main, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 为加速度传感器注册监听器
+        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mSensorManager.unregisterListener(this);
     }
 
     @Override
@@ -143,7 +162,6 @@ public class WkFragment extends Fragment implements SensorEventListener
 						{
 							jokeTask dTask = new jokeTask();
 							dTask.execute();
-							TuringJoke = true;
 						}
 						else
 						{
