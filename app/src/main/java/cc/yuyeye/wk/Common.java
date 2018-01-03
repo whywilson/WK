@@ -44,7 +44,8 @@ public class Common extends Application {
     public static BasicPushNotificationBuilder soundBuilder;
     public static String phoneAlias;
     public static SharedPreferences sharedPreferences;
-
+	public static OkHttpClient mClient;
+	
     private CustomPushNotificationBuilder vibrateBuilder;
     private WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams();
 
@@ -71,8 +72,10 @@ public class Common extends Application {
 	public static void initUrl() {
 		if(sharedPreferences.getBoolean("https_switch_key", true)){
 			url_domain = "https://api.yuyeye.cc/";
+			mClient = HttpsUtil.getTrustAllClient();
 		}else{
 			url_domain = "http://api.yuyeye.cc/";
+			mClient = new OkHttpClient();
 		}
 		wk_url = url_domain + "wk_url.php";
 		url_login = url_domain + "wk_login.php";
@@ -157,13 +160,11 @@ public class Common extends Application {
 				.add("imei", MainActivity.IMEI)
 				.build();
 			try {
-				//InputStream inputStream = context.getAssets().open("api.crt");
-				OkHttpClient client = HttpsUtil.getTrustAllClient();
 				Request request = new Request.Builder()
 					.url(wk_url)
 					.post(requestBody)
 					.build();
-				Response response = client.newCall(request).execute();
+				Response response = mClient.newCall(request).execute();
 				result = response.body().string();
 			} catch (Exception e) {
 				Log.e(TAG, "url okhttps " + e.toString());
@@ -236,13 +237,12 @@ public class Common extends Application {
 					.add("local_ip", localIp)
 					.add("ip", netIp)
 					.build();
-				//InputStream inputStream = context.getAssets().open("api.crt");
-				OkHttpClient client = HttpsUtil.getTrustAllClient();
+				
 				Request request = new Request.Builder()
 					.url(url_login)
 					.post(requestBody)
 					.build();
-				Response response = client.newCall(request).execute();
+				Response response = mClient.newCall(request).execute();
 				result = response.body().string();
 			} catch (Exception e) {
 				Log.e(TAG, "login " + e.toString());
@@ -297,13 +297,11 @@ public class Common extends Application {
 				.add("imei", MainActivity.IMEI)
 				.build();
 			try {
-				//InputStream inputStream = context.getAssets().open("api.crt");
-				OkHttpClient client = HttpsUtil.getTrustAllClient();
 				Request request = new Request.Builder()
 					.url(url_version)
 					.post(requestBody)
 					.build();
-				Response response = client.newCall(request).execute();
+				Response response = mClient.newCall(request).execute();
 				result = response.body().string();
 			} catch (Exception e) {
 				Log.e(TAG, "url okhttps " + e.toString());

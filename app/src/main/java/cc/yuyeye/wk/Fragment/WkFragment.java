@@ -23,6 +23,7 @@ import org.json.*;
 
 import static cc.yuyeye.wk.MainActivity.isWkOrNot;
 import static cc.yuyeye.wk.MainActivity.phoneAlias;
+import okhttp3.*;
 
 public class WkFragment extends Fragment
 {
@@ -300,61 +301,34 @@ public class WkFragment extends Fragment
 	{
 
         private String result;
-        private InputStream is;
-        private ArrayList<NameValuePair> nameValuePairs;
-
-        //后面尖括号内分别是参数（例子里是线程休息时间），进度（publishProgress用到），返回值类型
+        
         @Override
         protected void onPreExecute()
 		{
             //第一个执行方法
             result = "";
-
-            nameValuePairs = new ArrayList<>();
-            nameValuePairs.add(new BasicNameValuePair("key", "0aad89b1e6b74ab5932fe584269ea531"));
-            nameValuePairs.add(new BasicNameValuePair("info", "笑话"));
-            nameValuePairs.add(new BasicNameValuePair("userid", phoneAlias));
-
-            is = null;
             super.onPreExecute();
         }
 
         @Override
         protected String doInBackground(Integer[] params)
 		{
-            //第二个执行方法,onPreExecute()执行完后执行
-            try
-			{
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost("http://www.tuling123.com/openapi/api");
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity entity = response.getEntity();
-                is = entity.getContent();
-            }
-			catch (Exception e)
-			{
-                LogUtil.e("turing", "连接失败" + e.toString());
-            }
-
-            try
-			{
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"), 8);
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null)
-				{
-                    sb.append(line + "\n");
-                }
-                is.close();
-                result = sb.toString();
-            }
-			catch (Exception e)
-			{
-                LogUtil.e("turing", "转换" + e.toString());
-            }
-
+			RequestBody requestBody = new FormBody.Builder()
+				.add("key", "0aad89b1e6b74ab5932fe584269ea531")
+				.add("info", "笑话")
+				.add("userid", phoneAlias)
+				.build();
+			try {
+				Request request = new Request.Builder()
+					.url("http://www.tuling123.com/openapi/api")
+					.post(requestBody)
+					.build();
+				Response response = Common.mClient.newCall(request).execute();
+				result = response.body().string();
+			} catch (Exception e) {
+				Log.e("turing", "url  " + e.toString());
+			}
+			
             try
 			{
                 JSONObject jsonObj = new JSONObject(result);

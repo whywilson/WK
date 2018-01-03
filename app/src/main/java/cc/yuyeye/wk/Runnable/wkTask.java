@@ -58,12 +58,12 @@ public class wkTask {
 						.build();
 					try {
 						//InputStream inputStream = context.getAssets().open("api.crt");
-						OkHttpClient client = HttpsUtil.getTrustAllClient();
+						
 						Request request = new Request.Builder()
 							.url(wk_msgAddUrl)
 							.post(requestBody)
 							.build();
-						client.newCall(request).execute();
+					Common.mClient.newCall(request).execute();
 					} catch (Exception e) {
 						Log.e(LOG_TAG, "upload " + e.toString());
 					}
@@ -116,13 +116,11 @@ public class wkTask {
 				.add("report", report)
 				.build();
 			try {
-				//InputStream inputStream = context.getAssets().open("api.crt");
-				OkHttpClient client = HttpsUtil.getTrustAllClient();
 				Request request = new Request.Builder()
 					.url(wk_messageUrl)
 					.post(requestBody)
 					.build();
-				client.newCall(request).execute();
+				Common.mClient.newCall(request).execute();
                 report = "";
 				return 1;
             } catch (Exception e) {
@@ -173,13 +171,12 @@ public class wkTask {
 				.add("message", message)
 				.build();
 			try {
-				//InputStream inputStream = context.getAssets().open("api.crt");
-				OkHttpClient client = HttpsUtil.getTrustAllClient();
+				
 				Request request = new Request.Builder()
 					.url(wk_notifyUrl)
 					.post(requestBody)
 					.build();
-				client.newCall(request).execute();
+				Common.mClient.newCall(request).execute();
 				
 				return 1;
             } catch (Exception e) {

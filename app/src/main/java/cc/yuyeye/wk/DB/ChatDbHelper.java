@@ -19,14 +19,21 @@ class ChatDbHelper extends SQLiteOpenHelper
 	@Override
 	public void onCreate(SQLiteDatabase p1)
 	{
-		p1.execSQL(DB_TABLE);
+		if(MainActivity.phoneAlias.equals("")){
+			p1.execSQL("create table if not exists wk (_id integer primary key autoincrement, cSend text, cReceive text, cTime text, cMsg text)");
+		}else{
+			p1.execSQL(DB_TABLE);
+		}
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase p1, int p2, int p3)
 	{
-		//String sql1 = "drop table if exists card1";
-		p1.execSQL(DB_TABLE);
+		if(MainActivity.phoneAlias.equals("")){
+			p1.execSQL("create table if not exists wk (_id integer primary key autoincrement, cSend text, cReceive text, cTime text, cMsg text)");
+		}else{
+			p1.execSQL(DB_TABLE);
+		}
 		onCreate(p1);
 	}
 
