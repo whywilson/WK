@@ -315,21 +315,7 @@ public class ChatFragment extends Fragment {
 					}
 				}
 			});
-//        mChatTitleTime.setOnClickListener(new OnClickListener() {
-//
-//            private String report;
-//
-//            @Override
-//            public void onClick(View view) {
-//                report = "now";
-//                new Thread(wkTask.runWk_login).start();
-//                new Thread(wkTask.runWk_message).start();
-//                mChatLastLoginTime.setText("");
-//                mChatNetType.setText("");
-//                wk_timeTask wkTask = new wk_timeTask();
-//                wkTask.execute();
-//            }
-//        });
+
         mChatHeaderImage.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -845,26 +831,20 @@ public class ChatFragment extends Fragment {
         @Override
         protected String doInBackground(Integer[] params) {
 
-            RequestBody requestBody = new FormBody.Builder()
-				.add("alias", sendPerson)
-				.add("accept", phoneAlias)
-				.build();
+
 			try {
+				RequestBody requestBody = new FormBody.Builder()
+					.add("alias", sendPerson)
+					.add("accept", phoneAlias)
+					.build();
 				//InputStream inputStream = context.getAssets().open("api.crt");
-				OkHttpClient client = HttpsUtil.getTrustAllClient();
+//				OkHttpClient client = HttpsUtil.getTrustAllClient();
 				Request request = new Request.Builder()
-					.url(wk_timeUrl)
+					.url(wkTask.wk_timeUrl)
 					.post(requestBody)
 					.build();
-				Response response = client.newCall(request).execute();
-				result = response.body().toString();
-				
-//                HttpClient httpclient = new DefaultHttpClient();
-//                HttpPost httppost = new HttpPost(wk_timeUrl);
-//                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-//                HttpResponse response = httpclient.execute(httppost);
-//                HttpEntity entity = response.getEntity();
-//                is = entity.getContent();
+				Response response = Common.mClient.newCall(request).execute();
+				result = response.body().string();
             } catch (Exception e) {
                 LogUtil.e("wktime", "连接失败" + e.toString());
             }
@@ -876,7 +856,7 @@ public class ChatFragment extends Fragment {
                 chatNetType = jsonObj.getInt("nettype");
 				send_msg_time = jsonObj.getString("msg_time");
             } catch (JSONException e) {
-                LogUtil.e("wktime", "解析失败 " + e.toString() +"\nResult: " + result);
+                LogUtil.e("wktime", "解析失败 " + e.toString() + "\nResult: " + result);
             }
 
             return lastLoginTime;
@@ -884,9 +864,8 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            //doInBackground返回时触发，换句话说，就是doInBackground执行完后触发
-            //这里的result就是上面doInBackground执行后的返回值，所以这里是"执行完毕"
-            if (!Objects.equals(sendPerson, getString(R.string.allContacts)) && !Objects.equals(sendPerson, getString(R.string.Turing))) {
+            if (!Objects.equals(sendPerson,getActivity().getResources().getString(R.string.allContacts)) 
+					&& !Objects.equals(sendPerson,getActivity().getResources().getString(R.string.Turing))) {
                 Animation animLoading = AnimationUtils.loadAnimation(getActivity(), R.anim.popupfromtop_enter);
                 switch (chatNetType) {
                     case 0:
@@ -972,31 +951,22 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected String doInBackground(Integer[] params) {
-            try {
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost("http://www.tuling123.com/openapi/api");
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity entity = response.getEntity();
-                is = entity.getContent();
-            } catch (Exception e) {
-                LogUtil.e("turing", "连接失败" + e.toString());
-            }
-
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"), 8);
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line + "\n");
-                }
-                is.close();
-                result = sb.toString();
-            } catch (Exception e) {
-                LogUtil.e("turing", "转换" + e.toString());
-            }
-
+			RequestBody requestBody = new FormBody.Builder()
+				.add("key", "0aad89b1e6b74ab5932fe584269ea531")
+				.add("info", msgDetail)
+				.add("userid", phoneAlias)
+				.build();
+			try {
+				Request request = new Request.Builder()
+					.url("http://www.tuling123.com/openapi/api")
+					.post(requestBody)
+					.build();
+				Response response = Common.mClient.newCall(request).execute();
+				result = response.body().string();
+			} catch (Exception e) {
+				Log.e("turing", "url  " + e.toString());
+			}
+			
             try {
                 JSONObject jsonObj = new JSONObject(result);
 
