@@ -3,6 +3,9 @@ package cc.yuyeye.wk.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,7 +45,7 @@ import okhttp3.Response;
 import static cc.yuyeye.wk.MainActivity.isWkOrNot;
 import static cc.yuyeye.wk.MainActivity.phoneAlias;
 
-public class WkFragment extends Fragment
+public class WkFragment extends Fragment implements SensorEventListener
 {
 
     private LinearLayout mainLayout;
@@ -312,7 +315,17 @@ public class WkFragment extends Fragment
         };
         run_SetWallpaper.run();
 		// MainActivity.this.finish();
-    } 
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
 
     public class jokeTask extends AsyncTask<Integer, Integer, String>
 	{

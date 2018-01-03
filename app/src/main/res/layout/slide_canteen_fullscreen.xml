@@ -6,7 +6,7 @@
     <com.heinrichreimersoftware.materialintro.view.parallax.ParallaxRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/autumn_0"
+        android:background="@drawable/wk_bg_1"
         android:gravity="center">
 
 

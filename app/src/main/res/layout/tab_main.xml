@@ -7,7 +7,7 @@
 	style="@style/AppTheme"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:background="@drawable/autumn_0"
+	android:background="@drawable/wk_bg_1"
 	android:gravity="bottom"
 	android:orientation="vertical">
 
@@ -45,13 +45,13 @@
 				android:id="@+id/kImage"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:src="@drawable/karina" />
+				android:src="@drawable/karina_1" />
 
 			<ImageView
 				android:id="@+id/wImage"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:src="@drawable/wilson" />
+				android:src="@drawable/wilson_1" />
 
 		</LinearLayout>
 
