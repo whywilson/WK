@@ -356,17 +356,20 @@ public class ChatFragment extends Fragment {
 				}
 
 			});
-        chatAdaper.setOnItemListener(new ChatAdapter.OnItemListener() {
-				@Override
-				public void OnItemClickListener(int position, ChatAdapter.ViewHolder vh) {
+		if (chatAdaper != null) {
+			chatAdaper.setOnItemListener(new ChatAdapter.OnItemListener() {
+					@Override
+					public void OnItemClickListener(int position, ChatAdapter.ViewHolder vh) {
 
-				}
+					}
 
-				@Override
-				public boolean OnItemLongClickListener(int position, ChatAdapter.ViewHolder vh) {
-					return true;
-				}
-			});
+					@Override
+					public boolean OnItemLongClickListener(int position, ChatAdapter.ViewHolder vh) {
+						return true;
+					}
+				});
+		}
+
         mChatToolsShare.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View view) {
@@ -864,8 +867,8 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            if (!Objects.equals(sendPerson,getActivity().getResources().getString(R.string.allContacts)) 
-					&& !Objects.equals(sendPerson,getActivity().getResources().getString(R.string.Turing))) {
+            if (!Objects.equals(sendPerson, getActivity().getResources().getString(R.string.allContacts)) 
+				&& !Objects.equals(sendPerson, getActivity().getResources().getString(R.string.Turing))) {
                 Animation animLoading = AnimationUtils.loadAnimation(getActivity(), R.anim.popupfromtop_enter);
                 switch (chatNetType) {
                     case 0:
@@ -966,7 +969,7 @@ public class ChatFragment extends Fragment {
 			} catch (Exception e) {
 				Log.e("turing", "url  " + e.toString());
 			}
-			
+
             try {
                 JSONObject jsonObj = new JSONObject(result);
 
