@@ -78,6 +78,7 @@ import static cc.yuyeye.wk.MainActivity.getCurrentTime;
 import static cc.yuyeye.wk.MainActivity.mQueue;
 import static cc.yuyeye.wk.MainActivity.phoneAlias;
 import static cc.yuyeye.wk.MainActivity.sendPerson;
+import android.content.*;
 
 public class ChatFragment extends Fragment {
 
@@ -506,7 +507,7 @@ public class ChatFragment extends Fragment {
             mChatNetType.setText("");
             mChatLastLoginTime.setText("");
             if (sendPerson != null) {
-                new wk_timeTask().execute();
+                new wk_timeTask(getActivity()).execute();
             }
 
         }
@@ -759,7 +760,7 @@ public class ChatFragment extends Fragment {
         chatMsgHandler.sendEmptyMessage(-1);
         mChatNetType.setText("");
         mChatLastLoginTime.setText("");
-        wk_timeTask wkTask = new wk_timeTask();
+        wk_timeTask wkTask = new wk_timeTask(getActivity());
         wkTask.execute();
     }
 
@@ -853,7 +854,12 @@ public class ChatFragment extends Fragment {
         private String result;
         String send_msg_time;
         boolean isRead = false;
+		Context context;
 
+		public wk_timeTask(Context context) {
+			this.context = context;
+		}
+		
         @Override
         protected void onPreExecute() {
             result = "";
@@ -897,8 +903,8 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            if (!Objects.equals(sendPerson, getActivity().getResources().getString(R.string.allContacts))
-                    && !Objects.equals(sendPerson, getActivity().getResources().getString(R.string.Turing))) {
+            if (!sendPerson.equals(context.getResources().getString(R.string.allContacts))
+                    && !sendPerson.equals(context.getResources().getString(R.string.Turing))) {
                 Animation animLoading = AnimationUtils.loadAnimation(getActivity(), R.anim.popupfromtop_enter);
                 switch (chatNetType) {
                     case 0:

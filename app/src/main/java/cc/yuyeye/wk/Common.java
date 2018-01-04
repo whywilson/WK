@@ -68,7 +68,7 @@ public class Common extends Application {
     public static String phoneAlias;
     public static SharedPreferences sharedPreferences;
 	public static OkHttpClient mClient;
-	
+
     private CustomPushNotificationBuilder vibrateBuilder;
     private WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams();
 
@@ -87,16 +87,16 @@ public class Common extends Application {
         context = getApplicationContext();
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        startJPush();
-		
+		phoneAlias = sharedPreferences.getString(SettingUtil.ID_KEY, "");
+		startJPush();
 		initUrl();
     }
 
 	public static void initUrl() {
-		if(sharedPreferences.getBoolean("https_switch_key", true)){
+		if (sharedPreferences.getBoolean("https_switch_key", true)) {
 			url_domain = "https://api.yuyeye.cc/";
 			mClient = HttpsUtil.getTrustAllClient();
-		}else{
+		} else {
 			url_domain = "http://api.yuyeye.cc/";
 			mClient = new OkHttpClient();
 		}
@@ -110,7 +110,6 @@ public class Common extends Application {
     }
 
     public void startJPush() {
-        phoneAlias = sharedPreferences.getString(SettingUtil.ID_KEY, "");
         if (phoneAlias != "") {
             JPushInterface.init(this);
             vibrateBuilder = new CustomPushNotificationBuilder(this, R.layout.customer_notitfication_layout, R.id.icon, R.id.title, R.id.text);
@@ -249,7 +248,7 @@ public class Common extends Application {
 					.add("local_ip", localIp)
 					.add("ip", netIp)
 					.build();
-				
+
 				Request request = new Request.Builder()
 					.url(url_login)
 					.post(requestBody)
@@ -259,7 +258,7 @@ public class Common extends Application {
 			} catch (Exception e) {
 				Log.e(TAG, "login " + e.toString());
 			}
-			
+
             try {
                 JSONArray jArray = new JSONArray(result);
                 JSONObject jsonObj = jArray.getJSONObject(0);
@@ -317,7 +316,7 @@ public class Common extends Application {
 			} catch (Exception e) {
 				Log.e(TAG, "url version " + e.toString());
 			}
-			
+
             try {
                 JSONArray jArray = new JSONArray(result);
                 JSONObject jsonObj = jArray.getJSONObject(0);

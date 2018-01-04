@@ -11,9 +11,10 @@
 	android:gravity="bottom"
 	android:orientation="vertical">
 
-	<android.support.constraint.ConstraintLayout
+	<RelativeLayout
+		android:layout_height="match_parent"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent">
+		android:id="@+id/wk_bg">
 
 		<ImageView
 			android:id="@+id/sun_0"
@@ -21,39 +22,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:src="@drawable/sun_0"
-			tools:layout_editor_absoluteY="-6dp"
-			tools:layout_editor_absoluteX="-2dp" />
-
-		<LinearLayout
-			android:layout_height="wrap_content"
-			android:layout_width="0dp"
-			android:orientation="vertical"
-			android:visibility="invisible"
-			android:id="@+id/wkImage"
-			tools:layout_constraintTop_creator="1"
-			tools:layout_constraintRight_creator="1"
-			tools:layout_constraintBottom_creator="1"
-			android:layout_marginStart="8dp"
-			app:layout_constraintBottom_toBottomOf="parent"
-			android:layout_marginEnd="8dp"
-			app:layout_constraintRight_toRightOf="parent"
-			tools:layout_constraintLeft_creator="1"
-			app:layout_constraintLeft_toLeftOf="parent"
-			app:layout_constraintTop_toTopOf="parent">
-
-			<ImageView
-				android:id="@+id/kImage"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:src="@drawable/karina_1" />
-
-			<ImageView
-				android:id="@+id/wImage"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:src="@drawable/wilson_1" />
-
-		</LinearLayout>
+			android:layout_alignParentTop="true"
+			android:layout_margin="12dp"/>
 
 		<ImageView
 			android:src="@drawable/smile_0"
@@ -61,13 +31,39 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:id="@+id/smileCloud"
-			android:layout_marginEnd="55dp"
-			app:layout_constraintTop_toTopOf="parent"
-			android:layout_marginTop="109dp"
-			android:layout_marginRight="47dp"
-			app:layout_constraintRight_toRightOf="parent" />
+			android:layout_marginTop="64dp"
+			android:layout_marginRight="48dp"
+			android:layout_alignParentRight="true"/>
 
-	</android.support.constraint.ConstraintLayout>
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="vertical"
+			android:id="@+id/wkImage"
+			tools:layout_constraintTop_creator="1"
+			tools:layout_constraintRight_creator="1"
+			tools:layout_constraintBottom_creator="1"
+			android:layout_below="@id/smileCloud"
+			android:layout_marginTop="20dp"
+			android:visibility="visible"
+			android:paddingLeft="18dp"
+			android:paddingRight="18dp">
+
+			<ImageView
+				android:id="@+id/kImage"
+				android:layout_width="match_parent"
+				android:layout_height="72dp"
+				android:src="@drawable/karina_1"/>
+
+			<ImageView
+				android:id="@+id/wImage"
+				android:layout_width="match_parent"
+				android:layout_height="72dp"
+				android:src="@drawable/wilson_1"/>
+
+		</LinearLayout>
+
+	</RelativeLayout>
 
 </LinearLayout>
 
