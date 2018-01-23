@@ -26,6 +26,7 @@ import cc.yuyeye.wk.R;
 
 import static cc.yuyeye.wk.MainActivity.isWkOrNot;
 import static cc.yuyeye.wk.MainActivity.phoneAlias;
+import cc.yuyeye.wk.Dialog.*;
 
 public class WkFragment extends Fragment implements SensorEventListener {
 
@@ -117,21 +118,23 @@ public class WkFragment extends Fragment implements SensorEventListener {
 
 				@Override
 				public void onClick(View p1) {
+					mSensorManager.unregisterListener(mListener);
 					try {
 						if (Common.isUpdate) {
 							new Common.version(getActivity()).execute();
 						} else {
-							try {
-								Intent intent = new Intent(getActivity(), CanteenIntroActivity.class);
-								startActivity(intent);
-							} catch (Exception e) {
-								LogUtil.e("canteen", "start canteen error " + e.toString());
-							}
+							
+//							try {
+//								Intent intent = new Intent(getActivity(), CanteenIntroActivity.class);
+//								startActivity(intent);
+//							} catch (Exception e) {
+//								LogUtil.e("canteen", "start canteen error " + e.toString());
+//							}
 
 						}
 
 					} catch (Exception e) {
-						Log.i("checkUpdate", "checkVersion错误" + e);
+						Log.e("t-rex", "t-rex " + e.toString());
 					}
 				}
 
@@ -159,95 +162,18 @@ public class WkFragment extends Fragment implements SensorEventListener {
 				@Override
 				public boolean onLongClick(View p1) {
 					mSensorManager.unregisterListener(mListener);
-					
-					final View customView;
-					try {
-						customView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_webview, null);
-					} catch (InflateException e) {
-						throw new IllegalStateException("This device does not support Web Views.");
-					}
-					MaterialDialog dialog =
-						new MaterialDialog.Builder(getActivity())
-						.customView(customView, false)
-						.cancelable(false)
-						.autoDismiss(false)
-						.titleGravity(GravityEnum.CENTER)
-						//.titleColorRes(R.color.colorPrimary)
-						.title("短爪快跑")
-						.positiveText("嘚瑟一下")
-						.positiveColor(Color.BLACK)
-						.neutralText("关闭")
-						.onNeutral(new MaterialDialog.SingleButtonCallback(){
-
-							@Override
-							public void onClick(MaterialDialog p1, DialogAction p2) {
-								p1.dismiss();
-							}
-						})
-						.onPositive(new MaterialDialog.SingleButtonCallback(){
-
-							@Override
-							public void onClick(MaterialDialog p1, DialogAction p2) {
-								ToastUtil.showToast("有1000分了吗(⑉･̆-･̆⑉)");
-//								Bitmap bitmap = ScreenShot();
-//								Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, null, null));
-//								Intent shareIntent = new Intent(Intent.ACTION_SEND);
-//								shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-//								shareIntent.setType("image/jpeg");
-//								shareIntent.putExtra(Intent.EXTRA_SUBJECT, "短爪快跑");
-//								//shareIntent.putExtra(Intent.EXTRA_TEXT, text);
-//								shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//								getActivity().startActivity(Intent.createChooser(shareIntent, getActivity().getTitle()));
-							}
-						})
-						.build();
-						
+					gameDialog dialog = new gameDialog(MainActivity.mContext, R.style.Dialog);
 					dialog.setOnDismissListener(new DialogInterface.OnDismissListener(){
 
 							@Override
 							public void onDismiss(DialogInterface p1) {
 								mSensorManager.registerListener(mListener, mSensor, SensorManager.SENSOR_DELAY_GAME);
 							}
-					});
-					final WebView webView = (WebView) customView.findViewById(R.id.webview);
-					final ProgressBar loading = (ProgressBar) customView.findViewById(R.id.load_progress);
-					WebSettings websettings = webView.getSettings();
-					websettings.setJavaScriptEnabled(true);		
-					websettings.setSupportZoom(true);
-					websettings.setBuiltInZoomControls(false);
-					webView.setWebViewClient(new WebViewClient(){
-
-							@Override
-							public boolean shouldOverrideUrlLoading(WebView view, String url) {
-
-								if (url.startsWith("http") | url.startsWith("https")) {
-									super.shouldInterceptRequest(view, url);
-								} else {
-									Intent in = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-									startActivity(in);
-									return true;
-								}
-
-								return false;
-							}
-
-							@Override
-							public void onPageFinished(WebView view, String url) {
-								loading.setVisibility(View.INVISIBLE);
-								webView.setVisibility(View.VISIBLE);
-								super.onPageFinished(view, url);
-							}
-
 						});
-					String t_rex_url;
-					if (Common.getSharedPreference().getBoolean("https_switch_key", true)) {
-						t_rex_url = "https://yuyeye.cc/t-rex";
-					} else {
-						t_rex_url = "http://yuyeye.cc/t-rex";
-					}
-					webView.loadUrl(t_rex_url);
 
+					dialog.setCanceledOnTouchOutside(false);
 					dialog.show();
+					
 					//new Common.update(getActivity()).execute();
 					//	screenShotToWallpaper(false);
 					return true;
@@ -328,7 +254,7 @@ public class WkFragment extends Fragment implements SensorEventListener {
         return bmp;
     }
 
-    private void saveToSD(Bitmap bmp, String dirName, String fileName) throws IOException {
+    public static void saveToSD(Bitmap bmp, String dirName, String fileName) throws IOException {
         // 判断sd卡是否存在
         if (Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
