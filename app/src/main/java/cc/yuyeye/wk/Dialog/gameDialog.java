@@ -40,7 +40,6 @@ public class gameDialog extends Dialog {
 		setContentView(view);
 		super.onCreate(savedInstanceState);
 
-		Button bt_share = (Button) view.findViewById(R.id.bt_share);
 		final WebView webView = (WebView) view.findViewById(R.id.webview);
 		final ProgressBar loading = (ProgressBar) view.findViewById(R.id.load_progress);
 		webView.setBackgroundColor(0);
@@ -80,28 +79,6 @@ public class gameDialog extends Dialog {
 			t_rex_url = "http://yuyeye.cc/t-rex";
 		}
 		webView.loadUrl(t_rex_url);
-		bt_share.setOnClickListener(new View.OnClickListener(){
-
-				@Override
-				public void onClick(View p1) {
-					try {
-						Bitmap bitmap = webviewToBitmap(webView);
-						WkFragment.saveToSD(bitmap, Environment.getExternalStorageDirectory() + "/DCIM/Camera/", "wk.png");
-						//Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, null,null));
-//						uri = Uri.fromFile();
-//						Intent intent = new Intent();
-//						intent.setAction(Intent.ACTION_SEND);//设置分享行为
-//						intent.setType("image/*");//设置分享内容的类型
-//						intent.putExtra(Intent.EXTRA_STREAM, uri);
-//						intent = Intent.createChooser(intent, "分享");
-//						context.startActivity(intent);
-						//context.startActivity(Intent.createChooser(shareIntent, "Share to"));
-					} catch (Exception e) {
-						ToastUtil.showSimpleToast("Oooops " + e.toString());
-						Log.e("t-rex",e.toString());
-					}
-				}
-			});
 		webView.setOnLongClickListener(new OnLongClickListener(){
 
 				@Override

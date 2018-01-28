@@ -11,13 +11,6 @@
 		android:layout_height="240dp"
 		android:scrollbars="none"/>
 
-	<Button
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
-		android:text="Share"
-		android:layout_gravity="bottom|center_horizontal"
-		android:id="@+id/bt_share"/>
-
 	<ProgressBar
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content"

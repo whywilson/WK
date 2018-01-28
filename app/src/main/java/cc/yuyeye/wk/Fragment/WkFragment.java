@@ -149,7 +149,7 @@ public class WkFragment extends Fragment implements SensorEventListener {
 							jokeTask dTask = new jokeTask();
 							dTask.execute();
 						} else {
-							startMacWindow(1, getString(R.string.longPressToSetWallpaper) + "\n" + getString(R.string.getJokes));
+							startMacWindow(1, getString(R.string.longPressToSetWallpaper));
 							Reset++;
 						}
 					} else {

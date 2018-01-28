@@ -151,18 +151,26 @@ public class LoveCounter extends Activity {
 
                 void update() {
 
-                    if (j < 100) {
-                        duration = 1;
-                        i = (long) (pauseDays / 2 * Math.sin(j * Math.PI / 100 - Math.PI / 2) + pauseDays / 2) + 1;
-                    } else if (j == 100) {
-                        i = pauseDays;
-                        duration = 200;
-                    } else if (j < 200) {
-                        duration = 1;
-                        i = (long) ((togetherDays - pauseDays) / 2 * Math.sin(Math.PI / (200 - 100) * (j - 100) - Math.PI / 2) + (togetherDays - pauseDays) / 2 + pauseDays + 1);
-                    } else {
-                        i = togetherDays;
-                    }
+//                    if (j < 100) {
+//                        duration = 1;
+//                        i = (long) (pauseDays / 2 * Math.sin(j * Math.PI / 100 - Math.PI / 2) + pauseDays / 2) + 1;
+//                    } else if (j == 100) {
+//                        i = pauseDays;
+//                        duration = 200;
+//                    } else if (j < 200) {
+//                        duration = 1;
+//                        i = (long) ((togetherDays - pauseDays) / 2 * Math.sin(Math.PI / (200 - 100) * (j - 100) - Math.PI / 2) + (togetherDays - pauseDays) / 2 + pauseDays + 1);
+//                    } else {
+//                        i = togetherDays;
+//                    }
+					if(j <200){
+						duration =1;
+						i = togetherDays / 200 * j;
+					}else{
+						i = togetherDays;
+					}
+					
+					
                     j++;
 
                     tv_BetogetherDays.setText(i + "");
