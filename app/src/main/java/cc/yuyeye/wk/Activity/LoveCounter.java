@@ -24,7 +24,7 @@ import static cc.yuyeye.wk.MainActivity.isWkOrNot;
 public class LoveCounter extends Activity {
 
     public static String beginDate = "2015-05-04";
-    public static String pauseDate = "2016-12-10";
+    public static String loveDate = "2016-10-05";
     public static String comingDate = "2018-12-10";
 
     public static int Func;
@@ -75,7 +75,7 @@ public class LoveCounter extends Activity {
                 Date date3 = null;
                 try {
                     date1 = format.parse(beginDate);
-                    date2 = format.parse(pauseDate);
+                    date2 = format.parse(loveDate);
                     date3 = format.parse(comingDate);
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -151,24 +151,24 @@ public class LoveCounter extends Activity {
 
                 void update() {
 
-//                    if (j < 100) {
-//                        duration = 1;
-//                        i = (long) (pauseDays / 2 * Math.sin(j * Math.PI / 100 - Math.PI / 2) + pauseDays / 2) + 1;
-//                    } else if (j == 100) {
-//                        i = pauseDays;
-//                        duration = 200;
-//                    } else if (j < 200) {
-//                        duration = 1;
-//                        i = (long) ((togetherDays - pauseDays) / 2 * Math.sin(Math.PI / (200 - 100) * (j - 100) - Math.PI / 2) + (togetherDays - pauseDays) / 2 + pauseDays + 1);
-//                    } else {
-//                        i = togetherDays;
-//                    }
-					if(j <200){
-						duration =1;
-						i = togetherDays / 200 * j;
-					}else{
-						i = togetherDays;
-					}
+                    if (j < 100) {
+                        duration = 1;
+                        i = (long) (pauseDays / 2 * Math.sin(j * Math.PI / 100 - Math.PI / 2) + pauseDays / 2) + 1;
+                    } else if (j == 100) {
+                        i = pauseDays;
+                        duration = 170;
+                    } else if (j < 200) {
+                        duration = 1;
+                        i = (long) ((togetherDays - pauseDays) / 2 * Math.sin(Math.PI / (200 - 100) * (j - 100) - Math.PI / 2) + (togetherDays - pauseDays) / 2 + pauseDays + 1);
+                    } else {
+                        i = togetherDays;
+                    }
+//					if(j <200){
+//						duration =1;
+//						i = togetherDays / 200 * j;
+//					}else{
+//						i = togetherDays;
+//					}
 					
 					
                     j++;
