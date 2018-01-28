@@ -15,7 +15,8 @@
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
 		android:orientation="horizontal"
-		android:id="@+id/ll_togetherDays">
+		android:id="@+id/ll_togetherDays"
+		android:gravity="center">
 
 		<TextView
 			android:id="@+id/tv_WeHaveBeen"
@@ -30,7 +31,7 @@
 
 		<TextView
 			android:id="@+id/daysTextView"
-			android:layout_width="0dp"
+			android:layout_width="wrap_content"
 			android:layout_height="48dp"
 			android:gravity="center"
 			android:text="0"
@@ -38,7 +39,7 @@
 			android:textSize="15sp"
 			android:paddingLeft="8dp"
 			android:paddingRight="8dp"
-			android:layout_weight="1.0"/>
+			android:minWidth="48dp"/>
 
 		<TextView
 			android:id="@+id/tv_Days"
