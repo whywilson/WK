@@ -1,6 +1,15 @@
 # W.K. 
 Witness the ❤ between Wilson and Karina. 
 
+
+
+# V38
+```
+1.JPush更新至最新SDK
+2.添加Unsplash图库
+3.圣诞节头像
+```
+
 # V37
 ```
 1.更新至最新SDK
